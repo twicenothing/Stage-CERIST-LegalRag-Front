@@ -1,17 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { authClient } from "@/lib/auth-client";
-import { Spinner } from "./ui/spinner";
+import { useSession } from "@/lib/auth";
 
 const ProtectedRoute = () => {
-    const { data: session, isPending } = authClient.useSession();
-
-    if (isPending) {
-        return (
-            <div className="h-screen w-screen flex items-center justify-center">
-                <Spinner className="size-8" />
-            </div>
-        );
-    }
+    const { data: session } = useSession();
 
     if (!session) {
         return <Navigate to="/login" replace />;

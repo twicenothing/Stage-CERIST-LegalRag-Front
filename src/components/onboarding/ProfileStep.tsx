@@ -3,7 +3,7 @@ import { UserCheckIcon, PencilEditIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth";
 
 interface ProfileStepProps {
     onReady: (canContinue: boolean) => void;
@@ -11,7 +11,7 @@ interface ProfileStepProps {
 }
 
 export const ProfileStep = ({ onReady, onChange }: ProfileStepProps) => {
-    const { data: session } = authClient.useSession();
+    const { data: session } = useSession();
     const [name, setName] = useState(session?.user?.name || "");
 
     useEffect(() => {

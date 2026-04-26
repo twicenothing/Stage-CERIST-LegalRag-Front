@@ -1,29 +1,54 @@
-import { authClient } from "../lib/auth-client";
+import { apiNoAuth } from "@/lib/axios";
+import { SessionUser, useAuthStore } from "@/lib/auth";
 
-/**
- * Sends a 6-digit OTP to the user's email for passwordless sign-in.
- */
-export async function sendSignInOtp(email: string) {
-    const { data, error } = await authClient.emailOtp.sendVerificationOtp({
+interface LoginResponse {
+    access_token: string;
+    token_type: string;
+    user_name: string;
+}
+
+interface RegisterResponse {
+    message: string;
+    user_id: string;
+    email: string;
+}
+
+function decodeJwt<T = any>(token: string): T | null {
+    try {
+        const payload = token.split(".")[1];
+        const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+        return JSON.parse(json) as T;
+    } catch {
+        return null;
+    }
+}
+
+export async function login(email: string, password: string) {
+    const { data } = await apiNoAuth.post<LoginResponse>("/users/login", {
         email,
-        type: "sign-in",
+        password,
     });
 
-    if (error) throw error;
+    const decoded = decodeJwt<{ user_id: string }>(data.access_token);
+    const user: SessionUser = {
+        id: String(decoded?.user_id ?? ""),
+        email,
+        name: data.user_name,
+    };
+    useAuthStore.getState().setSession(data.access_token, user);
     return data;
 }
 
-/**
- * Sign in using the email and the OTP code received.
- * If the user doesn't exist, they will be automatically registered by Better Auth.
- * The bearer token is automatically captured and persisted by auth-client.ts.
- */
-export async function verifySignInOtp(email: string, otp: string) {
-    const { data, error } = await authClient.signIn.emailOtp({
-        email,
-        otp,
-    });
-
-    if (error) throw error;
+export async function register(payload: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+}) {
+    const { data } = await apiNoAuth.post<RegisterResponse>("/users/", payload);
     return data;
+}
+
+export function logout() {
+    useAuthStore.getState().clearSession();
 }

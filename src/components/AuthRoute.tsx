@@ -1,13 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { authClient } from "@/lib/auth-client";
-import { useRef } from "react";
+import { useSession } from "@/lib/auth";
 
 const AuthRoute = () => {
-    const { data: session, isPending } = authClient.useSession();
-    const hasResolved = useRef(false);
-
-    if (isPending && !hasResolved.current) return null;
-    hasResolved.current = true;
+    const { data: session } = useSession();
 
     if (session) {
         return <Navigate to="/" replace />;

@@ -10,7 +10,7 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useModal } from "@/hooks/use-modal";
-import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { RiAddLine, RiRobot2Line, RiSearchLine } from "@remixicon/react";
 import Logo from "../Logo";
@@ -23,7 +23,7 @@ interface ChatSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 const ChatSidebar = ({ sessionId, ...props }: ChatSidebarProps) => {
-    const session = authClient.useSession();
+    const session = useSession();
     const isLoggedIn = !!session.data;
     const { pathname } = useLocation();
     const { toggle } = useModal();

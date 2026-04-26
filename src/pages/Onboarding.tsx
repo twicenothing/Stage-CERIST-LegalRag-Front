@@ -11,13 +11,12 @@ import {
     CheckmarkCircle02Icon,
     ArrowLeft02Icon,
 } from "@hugeicons/core-free-icons";
-import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
 const Onboarding = () => {
     const [step, setStep] = useState(0);
     const [canContinue, setCanContinue] = useState(true);
-    const [username, setUsername] = useState("");
+    const [, setUsername] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const navigate = useNavigate();
 
@@ -42,15 +41,7 @@ const Onboarding = () => {
         if (isLastStep) {
             try {
                 setIsSaving(true);
-                const { error } = await authClient.updateUser({
-                    name: username,
-                });
-
-                if (error) {
-                    toast.error(error.message || "Failed to save profile");
-                } else {
-                    navigate("/");
-                }
+                navigate("/");
             } catch (err) {
                 toast.error("An unexpected error occurred");
             } finally {
@@ -59,7 +50,7 @@ const Onboarding = () => {
         } else {
             setStep((s) => s + 1);
         }
-    }, [isLastStep, username, navigate]);
+    }, [isLastStep, navigate]);
 
     return (
         <div className="min-h-dvh bg-background relative overflow-y-auto overflow-x-hidden flex flex-col items-center p-6">

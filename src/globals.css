@@ -194,7 +194,7 @@ button {
 
 body {
     @apply bg-background text-foreground;
-    font-family: "Figtree Variable", system-ui, -apple-system, sans-serif;
+    font-family: "Roboto Variable", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -206,6 +206,6 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: "Domine Variable", serif;
+    font-family: "Roboto Variable", system-ui, -apple-system, sans-serif;
     font-weight: 700;
 }

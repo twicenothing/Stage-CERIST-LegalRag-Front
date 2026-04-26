@@ -21,6 +21,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { ChatMessage, ChatSession } from "@/types/globals";
 import { API_URL } from "@/lib/constants";
+import { getToken } from "@/lib/auth";
 
 interface ChatProps {
   sessionId: string;
@@ -37,10 +38,10 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
   const { messages, setMessages, sendMessage, status } = useChat({
     id: sessionId,
     transport: new DefaultChatTransport({
-      api: API_URL + "/api/rag/chat",
+      api: API_URL + "/rag/chat",
       credentials: "include",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("zamili_token")}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     }),
     messages: existingChatSession?.chatMessages ?? [],

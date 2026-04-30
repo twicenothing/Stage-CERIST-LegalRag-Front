@@ -86,7 +86,7 @@ const ChatConversation = ({ messages, status }: ChatConversationProps) => {
                                                     <Message
                                                         from={message.role}
                                                     >
-                                                        <MessageContent variant="flat">
+                                                        <MessageContent variant="contained">
                                                             <Response>
                                                                 {part.text}
                                                             </Response>
@@ -229,7 +229,7 @@ const ChatConversation = ({ messages, status }: ChatConversationProps) => {
                         </div>
                     );
                 })}
-                {status === "submitted" && <Loader />}
+                {((status === "submitted") || (status === "streaming" && messages.at(-1)?.role === "assistant" && (messages.at(-1)?.parts.length === 0 || messages.at(-1)?.parts.every((p: any) => p.type === 'text' ? !p.text : false)))) && <Loader />}
             </ConversationContent>
             <ConversationScrollButton />
         </Conversation>

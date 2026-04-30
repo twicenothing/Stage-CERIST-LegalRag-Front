@@ -157,7 +157,7 @@ const LoginForm = () => {
                 </FormItem>
               )}
             />
-            <Button isLoading={isSubmitting} type="submit" className="w-full">
+            <Button isLoading={isSubmitting} type="submit" className="w-full bg-foreground text-background hover:bg-foreground/90 shadow-sm rounded-full">
               Create account
             </Button>
             <p className="text-center text-sm text-muted-foreground">
@@ -183,7 +183,7 @@ const LoginForm = () => {
         className="flex flex-col gap-6"
       >
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-bold">Welcome to Legal Rag</h1>
+          <h1 className="text-2xl font-bold">Welcome to Legal-DjazairIA</h1>
           <p className="text-sm text-muted-foreground">
             Sign in with your email and password
           </p>
@@ -219,7 +219,7 @@ const LoginForm = () => {
               </FormItem>
             )}
           />
-          <Button isLoading={isSubmitting} type="submit" className="w-full">
+          <Button isLoading={isSubmitting} type="submit" className="w-full bg-foreground text-background hover:bg-foreground/90 shadow-sm rounded-full">
             Sign in
           </Button>
           <p className="text-center text-sm text-muted-foreground">

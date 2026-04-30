@@ -85,42 +85,28 @@ const ChatConversation = ({ messages, status }: ChatConversationProps) => {
                                                 >
                                                     <Message
                                                         from={message.role}
+                                                        className="group"
                                                     >
+                                                        <Action
+                                                            className="opacity-0 group-hover:opacity-100 transition-opacity self-center"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(
+                                                                    part.text,
+                                                                );
+                                                                toast(
+                                                                    "Copied!",
+                                                                );
+                                                            }}
+                                                            label="Copy"
+                                                        >
+                                                            <CopyIcon className="size-3" />
+                                                        </Action>
                                                         <MessageContent variant="contained">
                                                             <Response>
                                                                 {part.text}
                                                             </Response>
                                                         </MessageContent>
                                                     </Message>
-                                                    {message.role ===
-                                                        "assistant" &&
-                                                        messageIndex ===
-                                                            messages.length -
-                                                                1 && (
-                                                            <Actions className="mt-2">
-                                                                {/* <Action
-																	onClick={() =>
-																		regenerate()
-																	}
-																	label="Retry"
-																>
-																	<RefreshCcwIcon className="size-3" />
-																</Action> */}
-                                                                <Action
-                                                                    onClick={() => {
-                                                                        navigator.clipboard.writeText(
-                                                                            part.text,
-                                                                        );
-                                                                        toast(
-                                                                            "Copied!",
-                                                                        );
-                                                                    }}
-                                                                    label="Copy"
-                                                                >
-                                                                    <CopyIcon className="size-3" />
-                                                                </Action>
-                                                            </Actions>
-                                                        )}
                                                 </Fragment>
                                             );
                                         case "reasoning":

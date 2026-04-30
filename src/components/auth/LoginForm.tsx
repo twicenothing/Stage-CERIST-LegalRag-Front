@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { login, register as registerUser } from "@/services/auth";
+import logoUrl from "@/assets/CERIST.png";
 
 const loginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address." }),
@@ -93,6 +94,7 @@ const LoginForm = () => {
           className="flex flex-col gap-6"
         >
           <div className="flex flex-col items-center gap-2 text-center">
+            <img src={logoUrl} alt="CERIST Logo" className="h-28 w-auto object-contain mb-6" />
             <h1 className="text-2xl font-bold">Create your account</h1>
             <p className="text-sm text-muted-foreground">
               Join LegalRag in a few seconds
@@ -183,6 +185,7 @@ const LoginForm = () => {
         className="flex flex-col gap-6"
       >
         <div className="flex flex-col items-center gap-2 text-center">
+          <img src={logoUrl} alt="CERIST Logo" className="h-28 w-auto object-contain mb-6" />
           <h1 className="text-2xl font-bold">Welcome to Legal-DjazairIA</h1>
           <p className="text-sm text-muted-foreground">
             Sign in with your email and password

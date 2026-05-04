@@ -40,12 +40,16 @@ const DeleteSessionConfirmationModal = () => {
                 exact: false,
             });
 
-            toggle("SEARCH_CHAT_SESSIONS");
+            if (actionData?.fromSearch) {
+                toggle("SEARCH_CHAT_SESSIONS");
+            } else {
+                toggle("DELETE_SESSION_CONFIRMATION");
+            }
 
             // Navigate to a new chat if the deleted session is the current one
             const currentSessionId = searchParams.get("sessionId");
             if (actionData && actionData.sessionId === currentSessionId) {
-                navigate("/chat");
+                navigate("/");
             }
         },
         onError(error) {
@@ -59,25 +63,38 @@ const DeleteSessionConfirmationModal = () => {
 
     if (!actionData) return null;
 
+    const handleOpenChange = () => {
+        if (actionData.fromSearch) {
+            toggle("SEARCH_CHAT_SESSIONS");
+        } else {
+            toggle("DELETE_SESSION_CONFIRMATION");
+        }
+    };
+
+    const handleCancel = () => {
+        if (actionData.fromSearch) {
+            toggle("SEARCH_CHAT_SESSIONS");
+        } else {
+            toggle("DELETE_SESSION_CONFIRMATION");
+        }
+    };
+
     return (
         <AlertDialog
             open={isOpen("DELETE_SESSION_CONFIRMATION")}
-            onOpenChange={() => toggle("SEARCH_CHAT_SESSIONS")}
+            onOpenChange={handleOpenChange}
         >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        Êtes-vous absolument sûr(e) ?
+                        Supprimer la session ?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        Cette action est irréversible. Cela supprimera définitivement
-                        la session et effacera les données de nos serveurs.
+                        cette action entraînera la suppression de "{actionData.sessionTitle}"
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel
-                        onClick={() => toggle("SEARCH_CHAT_SESSIONS")}
-                    >
+                    <AlertDialogCancel onClick={handleCancel}>
                         Annuler
                     </AlertDialogCancel>
                     <AlertDialogAction
@@ -88,7 +105,7 @@ const DeleteSessionConfirmationModal = () => {
                         }}
                         disabled={isPending}
                     >
-                        {isPending ? "Suppression..." : "Continuer"}
+                        {isPending ? "Suppression..." : "Supprimer"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -52,12 +52,15 @@ const SearchSessionsModal = () => {
     const handleDelete = (
         e: React.MouseEvent,
         sessionId: ChatSession["id"],
+        sessionTitle: string,
     ) => {
         e.preventDefault();
         e.stopPropagation();
 
         toggle("DELETE_SESSION_CONFIRMATION", {
             sessionId,
+            sessionTitle,
+            fromSearch: true,
         });
     };
 
@@ -105,7 +108,7 @@ const SearchSessionsModal = () => {
                                         <button
                                             className="shrink-0"
                                             onClick={(e) =>
-                                                handleDelete(e, session.id)
+                                                handleDelete(e, session.id, session.title)
                                             }
                                         >
                                             <HugeiconsIcon

@@ -8,19 +8,20 @@ import {
 } from "@/components/ui/sidebar";
 
 import {
-  deleteChatSession,
   getUserChatSessions,
 } from "@/services/chat-sessions";
 import { cn } from "@/lib/utils";
 import { RiDeleteBin7Line } from "@remixicon/react";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
 import { ChatSession } from "@/types/globals";
 import { Link, useSearchParams } from "react-router-dom";
+import { useModal } from "@/hooks/use-modal";
 
 const ChatHistory = () => {
   const [searchParams] = useSearchParams();
   const currentSessionId = searchParams.get("sessionId");
+  const { toggle } = useModal();
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["chat-sessions-history"],
@@ -34,7 +35,6 @@ const ChatHistory = () => {
       },
       initialPageParam: 1,
     });
-  const queryClient = useQueryClient();
 
   const pastChatSessions = data?.pages.flatMap((page) => page) || [];
 
@@ -66,10 +66,13 @@ const ChatHistory = () => {
                         </Link>
                         <button
                           className="opacity-0 peer-hover:opacity-100 hover:opacity-100 transition-opacity shrink-0"
-                          onClick={async () => {
-                            await deleteChatSession(chatSession.id);
-                            queryClient.invalidateQueries({
-                              queryKey: ["chat-sessions-history"],
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggle("DELETE_SESSION_CONFIRMATION", {
+                              sessionId: chatSession.id,
+                              sessionTitle: chatSession.title,
+                              fromSearch: false,
                             });
                           }}
                         >

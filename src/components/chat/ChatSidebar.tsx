@@ -13,6 +13,7 @@ import { useModal } from "@/hooks/use-modal";
 import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { RiAddLine, RiRobot2Line, RiSearchLine } from "@remixicon/react";
+import { SettingsIcon } from "lucide-react";
 import Logo from "../Logo";
 import ChatHistory from "./ChatHistory";
 import { ChatSession } from "@/types/globals";
@@ -44,15 +45,16 @@ const ChatSidebar = ({ sessionId, ...props }: ChatSidebarProps) => {
                 >
                     <SidebarMenu>
                         <SidebarMenuItem className="group">
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton asChild className="text-foreground font-medium">
                                 <Link className="group" to={pathname}>
                                     <RiAddLine className="size-5 mr-2" />
-                                    <span>New chat</span>
+                                    <span>Nouveau chat</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem className="group">
                             <SidebarMenuButton
+                                className="text-foreground font-medium"
                                 onClick={() =>
                                     toggle("SEARCH_CHAT_SESSIONS", {
                                         currentSessionId: sessionId,
@@ -60,26 +62,37 @@ const ChatSidebar = ({ sessionId, ...props }: ChatSidebarProps) => {
                                 }
                             >
                                 <RiSearchLine className="size-5 mr-2" />
-                                <span>Search chats</span>
+                                <span>Rechercher des chats</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarGroup>
                 <ChatHistory />
             </SidebarContent>
-            {!isLoggedIn && (
-                <SidebarFooter>
+            <SidebarFooter>
+                {!isLoggedIn && (
                     <SidebarMenuButton
                         asChild
-                        tooltip="Create your own assistant"
+                        tooltip="Créez votre propre assistant"
+                        className="text-foreground font-medium"
                     >
                         <Link to="/">
                             <RiRobot2Line />{" "}
-                            <span>Create your own assistant</span>
+                            <span>Créez votre propre assistant</span>
                         </Link>
                     </SidebarMenuButton>
-                </SidebarFooter>
-            )}
+                )}
+                <SidebarMenuButton
+                    asChild
+                    tooltip="Paramètres"
+                    className="text-foreground font-medium"
+                >
+                    <Link to="/settings">
+                        <SettingsIcon className="size-5" />
+                        <span>Paramètres</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarFooter>
         </Sidebar>
     );
 };

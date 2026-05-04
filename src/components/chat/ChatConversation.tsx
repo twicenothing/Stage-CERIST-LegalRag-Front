@@ -94,10 +94,10 @@ const ChatConversation = ({ messages, status }: ChatConversationProps) => {
                                                                     part.text,
                                                                 );
                                                                 toast(
-                                                                    "Copied!",
+                                                                    "Copié !",
                                                                 );
                                                             }}
-                                                            label="Copy"
+                                                            label="Copier"
                                                         >
                                                             <CopyIcon className="size-3" />
                                                         </Action>
@@ -182,13 +182,13 @@ const ChatConversation = ({ messages, status }: ChatConversationProps) => {
                                                         </div>
                                                         <div className="flex flex-col overflow-hidden">
                                                             <span className="text-sm font-medium truncate">
-                                                                File Attachment
+                                                                Pièce jointe
                                                             </span>
                                                             <span className="text-xs text-muted-foreground truncate uppercase">
                                                                 {part.mediaType
                                                                     .split("/")
                                                                     .pop() ||
-                                                                    "UNKNOWN"}
+                                                                    "INCONNU"}
                                                             </span>
                                                         </div>
                                                     </div>

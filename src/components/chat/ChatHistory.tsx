@@ -16,9 +16,11 @@ import { RiDeleteBin7Line } from "@remixicon/react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
 import { ChatSession } from "@/types/globals";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const ChatHistory = () => {
+  const [searchParams] = useSearchParams();
+  const currentSessionId = searchParams.get("sessionId");
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["chat-sessions-history"],
@@ -43,15 +45,17 @@ const ChatHistory = () => {
         isLoading && "h-full",
       )}
     >
-      <SidebarGroupLabel>History</SidebarGroupLabel>
+      <SidebarGroupLabel>Historique</SidebarGroupLabel>
       {!isLoading ? (
         <>
           {pastChatSessions.length > 0 ? (
             <>
               <SidebarMenu>
-                {pastChatSessions.map((chatSession) => (
+                {pastChatSessions.map((chatSession) => {
+                  const isActive = chatSession.id === currentSessionId;
+                  return (
                   <SidebarMenuItem className="group" key={chatSession.id}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild isActive={isActive} className={cn(isActive ? "border border-border text-foreground font-medium bg-secondary/50" : "text-muted-foreground")}>
                       <div className="flex items-center justify-between w-full gap-0">
                         <Link
                           title={chatSession.title}
@@ -74,7 +78,7 @@ const ChatHistory = () => {
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
+                )})}
               </SidebarMenu>
               {hasNextPage && (
                 <Button
@@ -87,14 +91,14 @@ const ChatHistory = () => {
                   {isFetchingNextPage ? (
                     <Spinner className="size-7" />
                   ) : (
-                    "Load more"
+                    "Charger plus"
                   )}
                 </Button>
               )}
             </>
           ) : (
             <p className="text-center py-8 text-sm">
-              No chat history available
+              Aucun historique de chat disponible
             </p>
           )}
         </>

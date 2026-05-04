@@ -30,7 +30,7 @@ const DeleteSessionConfirmationModal = () => {
             await deleteChatSession(actionData.sessionId);
         },
         onSuccess() {
-            toast.success("Session deleted successfully");
+            toast.success("Session supprimée avec succès");
 
             queryClient.invalidateQueries({
                 queryKey: ["chat-sessions-history-search"],
@@ -52,7 +52,7 @@ const DeleteSessionConfirmationModal = () => {
             if (isAxiosError(error)) {
                 toast.error(error.response?.data.message);
             } else {
-                toast.error("An error occurred while deleting the session");
+                toast.error("Une erreur s'est produite lors de la suppression de la session");
             }
         },
     });
@@ -67,18 +67,18 @@ const DeleteSessionConfirmationModal = () => {
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        Are you absolutely sure?
+                        Êtes-vous absolument sûr(e) ?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete the session and remove the data from our servers.
+                        Cette action est irréversible. Cela supprimera définitivement
+                        la session et effacera les données de nos serveurs.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel
                         onClick={() => toggle("SEARCH_CHAT_SESSIONS")}
                     >
-                        Cancel
+                        Annuler
                     </AlertDialogCancel>
                     <AlertDialogAction
                         className={buttonVariants({ variant: "destructive" })}
@@ -88,7 +88,7 @@ const DeleteSessionConfirmationModal = () => {
                         }}
                         disabled={isPending}
                     >
-                        {isPending ? "Deleting..." : "Continue"}
+                        {isPending ? "Suppression..." : "Continuer"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

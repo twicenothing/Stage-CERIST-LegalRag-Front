@@ -56,7 +56,7 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to send message");
+      toast.error(error.message || "Échec de l'envoi du message");
     },
     generateId: nanoid,
     // experimental_throttle: 20,
@@ -94,7 +94,7 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
 
     sendMessage(
       {
-        text: message.text || "Sent with attachments",
+        text: message.text || "Envoyé avec des pièces jointes",
         files: message.files,
       },
       {
@@ -153,7 +153,7 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
                       className="mt-4"
                       input={input}
                       setInput={setInput}
-                      placeholder="Ask a question..."
+                      placeholder="Posez une question..."
                       onSubmit={handleSubmit}
                     />
                   </div>

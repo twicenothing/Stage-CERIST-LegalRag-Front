@@ -68,16 +68,16 @@ const SearchSessionsModal = () => {
         >
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Search sessions</DialogTitle>
+                    <DialogTitle>Rechercher des sessions</DialogTitle>
                     <DialogDescription>
-                        Search through your sessions history.
+                        Recherchez dans l'historique de vos sessions.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="relative">
                         <RiSearchLine className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Search chats..."
+                            placeholder="Rechercher des chats..."
                             className="pl-9"
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
@@ -125,14 +125,14 @@ const SearchSessionsModal = () => {
                                         disabled={isFetchingNextPage}
                                     >
                                         {isFetchingNextPage
-                                            ? "Loading..."
-                                            : "Load more"}
+                                            ? "Chargement..."
+                                            : "Charger plus"}
                                     </Button>
                                 )}
                             </>
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
-                                <p>No sessions found</p>
+                                <p>Aucune session trouvée</p>
                             </div>
                         )}
                     </div>

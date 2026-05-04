@@ -8,9 +8,10 @@ import ChatPage from "@/pages/Chat";
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<ChatPage />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route element={<ProtectedRoute />}></Route>
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<ChatPage />} />
+        <Route path="/settings" element={<Settings />} />
+      </Route>
       <Route element={<AuthRoute />}>
         <Route path="/login" element={<LoginPage />} />
       </Route>

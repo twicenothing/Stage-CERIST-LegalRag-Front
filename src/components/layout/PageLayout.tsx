@@ -1,11 +1,15 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 interface PageHeaderProps {
     title: string;
     subtitle?: string;
     children?: React.ReactNode;
     className?: string;
+    showBackButton?: boolean;
 }
 
 export const PageHeader = ({
@@ -13,7 +17,10 @@ export const PageHeader = ({
     subtitle,
     children,
     className,
+    showBackButton,
 }: PageHeaderProps) => {
+    const navigate = useNavigate();
+
     return (
         <header
             className={cn(
@@ -22,15 +29,26 @@ export const PageHeader = ({
             )}
         >
             <div className="px-6 py-5 max-w-2xl mx-auto flex items-center justify-between">
-                <div>
-                    <h1 className="text-xl font-extrabold tracking-tight leading-none text-foreground">
-                        {title}
-                    </h1>
-                    {subtitle && (
-                        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest opacity-60 mt-1.5">
-                            {subtitle}
-                        </p>
+                <div className="flex items-center gap-4">
+                    {showBackButton && (
+                        <button
+                            onClick={() => navigate("/")}
+                            className="p-2 -ml-2 rounded-full hover:bg-muted/80 transition-colors"
+                            title="Go back"
+                        >
+                            <HugeiconsIcon icon={ArrowLeft01Icon} className="size-5 text-muted-foreground hover:text-foreground transition-colors" />
+                        </button>
                     )}
+                    <div>
+                        <h1 className="text-xl font-extrabold tracking-tight leading-none text-foreground">
+                            {title}
+                        </h1>
+                        {subtitle && (
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest opacity-60 mt-1.5">
+                                {subtitle}
+                            </p>
+                        )}
+                    </div>
                 </div>
                 {children}
             </div>

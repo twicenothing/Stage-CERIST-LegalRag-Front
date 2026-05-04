@@ -9,6 +9,7 @@ export default function Settings() {
             <PageHeader
                 title="Settings"
                 subtitle="Configuration & Preferences"
+                showBackButton
             />
 
             <PageContent maxWidth="xl" className="space-y-10">

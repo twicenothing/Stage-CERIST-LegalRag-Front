@@ -40,6 +40,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { ArrowUpIcon } from "lucide-react";
 import {
 	Add01Icon,
 	AttachmentIcon,
@@ -47,7 +48,6 @@ import {
 	Image03Icon,
 	Mic01Icon,
 	PauseIcon,
-	SentIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ChatStatus, FileUIPart } from "ai";
@@ -1095,7 +1095,7 @@ export const PromptInputSubmit = ({
 	...props
 }: PromptInputSubmitProps) => {
 	let Icon = (
-		<HugeiconsIcon strokeWidth={2} icon={SentIcon} className="size-4.5" />
+		<ArrowUpIcon strokeWidth={2.5} className="size-4.5" />
 	);
 
 	if (status === "submitted") {

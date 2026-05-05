@@ -111,6 +111,16 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
       navigate(`?sessionId=${sessionId}`);
     }
   };
+  const handleEditClick = (text: string) => {
+    setInput(text);
+    setTimeout(() => {
+      const textarea = document.querySelector("textarea");
+      if (textarea) {
+        textarea.focus();
+        textarea.setSelectionRange(text.length, text.length);
+      }
+    }, 0);
+  };
 
   return (
     <>
@@ -135,7 +145,7 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
               ) : (
                 <>
                   {hasMessages && (
-                    <ChatConversation messages={messages} status={status} />
+                    <ChatConversation messages={messages} status={status} onEditClick={handleEditClick} />
                   )}
                   <div
                     className={cn(
@@ -156,6 +166,9 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
                       placeholder="Posez une question..."
                       onSubmit={handleSubmit}
                     />
+                    <p className="text-[11px] text-muted-foreground/60 text-center font-medium mt-1">
+                      L'IA peut faire des erreurs. Veuillez vérifier les informations importantes.
+                    </p>
                   </div>
                 </>
               )}

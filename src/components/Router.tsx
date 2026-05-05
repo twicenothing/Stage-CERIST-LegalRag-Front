@@ -4,6 +4,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import AuthRoute from "./AuthRoute";
 import Settings from "@/pages/Settings";
 import ChatPage from "@/pages/Chat";
+import Overview from "@/pages/Overview";
 
 const Router = () => {
   return (
@@ -11,6 +12,7 @@ const Router = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<ChatPage />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/overview" element={<Overview />} />
       </Route>
       <Route element={<AuthRoute />}>
         <Route path="/login" element={<LoginPage />} />

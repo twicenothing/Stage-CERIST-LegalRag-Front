@@ -12,7 +12,7 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { RiAddLine, RiRobot2Line, RiSearchLine } from "@remixicon/react";
+import { RiAddLine, RiRobot2Line, RiSearchLine, RiBookOpenLine } from "@remixicon/react";
 import { SettingsIcon } from "lucide-react";
 import Logo from "../Logo";
 import ChatHistory from "./ChatHistory";
@@ -44,6 +44,14 @@ const ChatSidebar = ({ sessionId, ...props }: ChatSidebarProps) => {
                     className={cn("group-data-[collapsible=icon]:hidden")}
                 >
                     <SidebarMenu>
+                        <SidebarMenuItem className="group">
+                            <SidebarMenuButton asChild className="text-foreground font-medium">
+                                <Link className="group" to="/overview">
+                                    <RiBookOpenLine className="size-5 mr-2" />
+                                    <span>Vue d'ensemble</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
                         <SidebarMenuItem className="group">
                             <SidebarMenuButton asChild className="text-foreground font-medium">
                                 <Link className="group" to={pathname}>

@@ -186,7 +186,7 @@ const LoginForm = () => {
       >
         <div className="flex flex-col items-center gap-2 text-center">
           <img src={logoUrl} alt="CERIST Logo" className="h-28 w-auto object-contain mb-6" />
-          <h1 className="text-2xl font-bold">Welcome to Legal-DjazairIA</h1>
+          <h1 className="text-2xl font-bold">Bienvenue à Légal DjazairIA</h1>
           <p className="text-sm text-muted-foreground">
             Sign in with your email and password
           </p>

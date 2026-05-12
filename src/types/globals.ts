@@ -16,6 +16,7 @@ export interface ChatMessage {
     role: ChatRole;
     parts: any[];
     attachments: any[];
+    feedback?: "like" | "dislike" | null;
     created_at: Date;
 }
 

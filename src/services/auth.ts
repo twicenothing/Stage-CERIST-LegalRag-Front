@@ -5,6 +5,7 @@ interface LoginResponse {
     access_token: string;
     token_type: string;
     user_name: string;
+    role: string;
 }
 
 interface RegisterResponse {
@@ -34,6 +35,7 @@ export async function login(email: string, password: string) {
         id: String(decoded?.user_id ?? ""),
         email,
         name: data.user_name,
+        role: data.role || decoded?.role || "utilisateur",
     };
     useAuthStore.getState().setSession(data.access_token, user);
     return data;

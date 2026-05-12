@@ -21,7 +21,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { ChatMessage, ChatSession } from "@/types/globals";
 import { API_URL } from "@/lib/constants";
-import { getToken } from "@/lib/auth";
+import { getToken, useSession } from "@/lib/auth";
+import { getChatSession } from "@/services/chat-sessions";
+import { Button } from "@/components/ui/button";
+import { LayoutDashboardIcon } from "lucide-react";
 
 interface ChatProps {
   sessionId: string;
@@ -54,6 +57,26 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
       }
 
       queryClient.invalidateQueries({ queryKey: ["user"] });
+
+      // Fetch the session after a small delay to ensure backend has saved the message
+      setTimeout(async () => {
+        try {
+          const session = await getChatSession(sessionId);
+          if (session && session.chatMessages) {
+            setMessages((currentMessages) => {
+              return currentMessages.map((msg, index) => {
+                const dbMsg = session.chatMessages[index];
+                if (dbMsg && dbMsg.role === msg.role) {
+                  return { ...msg, id: dbMsg.id, feedback: dbMsg.feedback };
+                }
+                return msg;
+              });
+            });
+          }
+        } catch (error) {
+          console.error("Failed to sync messages:", error);
+        }
+      }, 1000);
     },
     onError: (error) => {
       toast.error(error.message || "Échec de l'envoi du message");
@@ -176,9 +199,14 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
           </div>
         </SidebarInset>
       </SidebarProvider>
-      {/* <div className="absolute top-4 right-4">
-                <Usage user={user} />
-            </div> */}
+      {useSession().data?.user?.role === "admin" && (
+        <div className="absolute top-4 right-4 z-50">
+          <Button variant="outline" onClick={() => navigate("/dashboard")} className="shadow-sm gap-2 rounded-full">
+            <LayoutDashboardIcon className="size-4" />
+            <span className="hidden sm:inline">Tableau de bord</span>
+          </Button>
+        </div>
+      )}
     </>
   );
 };

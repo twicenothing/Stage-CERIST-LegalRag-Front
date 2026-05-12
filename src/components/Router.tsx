@@ -5,6 +5,10 @@ import AuthRoute from "./AuthRoute";
 import Settings from "@/pages/Settings";
 import ChatPage from "@/pages/Chat";
 import Overview from "@/pages/Overview";
+import DashboardLayout from "@/pages/DashboardLayout";
+import UsersDashboard from "@/pages/UsersDashboard";
+import StatisticsDashboard from "@/pages/StatisticsDashboard";
+import { Navigate } from "react-router-dom";
 
 const Router = () => {
   return (
@@ -13,6 +17,11 @@ const Router = () => {
         <Route path="/" element={<ChatPage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/overview" element={<Overview />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/dashboard/users" replace />} />
+          <Route path="users" element={<UsersDashboard />} />
+          <Route path="statistics" element={<StatisticsDashboard />} />
+        </Route>
       </Route>
       <Route element={<AuthRoute />}>
         <Route path="/login" element={<LoginPage />} />

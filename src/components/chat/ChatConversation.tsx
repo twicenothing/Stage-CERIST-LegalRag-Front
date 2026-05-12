@@ -22,8 +22,9 @@ import {
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types/globals";
 import type { ChatStatus } from "ai";
-import { CopyIcon, FileIcon, ChevronDownIcon, PencilIcon } from "lucide-react";
+import { CopyIcon, FileIcon, ChevronDownIcon, PencilIcon, ThumbsUpIcon, ThumbsDownIcon, CheckIcon } from "lucide-react";
 import { Fragment, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { API_URL } from "@/lib/constants";
 import { getToken } from "@/lib/auth";
@@ -132,6 +133,39 @@ interface ChatConversationProps {
 }
 
 const ChatConversation = ({ messages, status, onEditClick }: ChatConversationProps) => {
+    const [feedbackState, setFeedbackState] = useState<Record<string, "like" | "dislike" | null>>({});
+
+    const handleFeedback = async (messageId: string, feedback: "like" | "dislike" | null) => {
+        if (!messageId || messageId.length < 32) {
+            toast.error("Veuillez patienter, la réponse n'est pas encore enregistrée.");
+            return;
+        }
+
+        setFeedbackState(prev => ({ ...prev, [messageId]: feedback }));
+        
+        try {
+            const response = await fetch(`${API_URL}/rag/message/${messageId}/feedback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({ feedback })
+            });
+            
+            if (!response.ok) {
+                throw new Error("Erreur de feedback");
+            }
+        } catch (err) {
+            setFeedbackState(prev => {
+                const newState = { ...prev };
+                delete newState[messageId];
+                return newState;
+            });
+            toast.error("Erreur lors de l'envoi du feedback");
+        }
+    };
+
     return (
         <Conversation className="h-full">
             <ConversationContent className="max-md:p-2">
@@ -218,6 +252,23 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                             const { mainText, sourcesText } = parseTextAndSources(part.text);
                                             const sources = sourcesText ? parseSources(sourcesText) : [];
 
+                                            if (!mainText && sources.length === 0) {
+                                                if (status === "streaming" && message.id === messages.at(-1)?.id) {
+                                                    return (
+                                                        <Fragment key={`${message.id}-${i}`}>
+                                                            <Message from={message.role} className="group items-start">
+                                                                <div className="flex flex-col w-full">
+                                                                    <MessageContent variant="contained" className="w-fit max-w-full px-5 py-4">
+                                                                        <Loader className="text-muted-foreground" />
+                                                                    </MessageContent>
+                                                                </div>
+                                                            </Message>
+                                                        </Fragment>
+                                                    );
+                                                }
+                                                return null;
+                                            }
+
                                             return (
                                                 <Fragment
                                                     key={`${message.id}-${i}`}
@@ -226,20 +277,6 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                         from={message.role}
                                                         className="group items-start"
                                                     >
-                                                        <Action
-                                                            className="opacity-0 group-hover:opacity-100 transition-opacity self-center"
-                                                            onClick={() => {
-                                                                navigator.clipboard.writeText(
-                                                                    part.text,
-                                                                );
-                                                                toast(
-                                                                    "Copié !",
-                                                                );
-                                                            }}
-                                                            label="Copier"
-                                                        >
-                                                            <CopyIcon className="size-3" />
-                                                        </Action>
                                                         <div className="flex flex-col w-full">
                                                             <MessageContent variant="contained" className="w-fit max-w-full">
                                                                 <Response>
@@ -247,6 +284,69 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                                 </Response>
                                                             </MessageContent>
                                                             <SourcesViewer sources={sources} />
+                                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 flex flex-row items-center gap-1">
+                                                                <Action
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(
+                                                                            part.text,
+                                                                        );
+                                                                        toast(
+                                                                            "Copié !",
+                                                                        );
+                                                                    }}
+                                                                    label="Copier"
+                                                                >
+                                                                    <CopyIcon className="size-3" />
+                                                                </Action>
+                                                                {(() => {
+                                                                    const currentFeedback = feedbackState[message.id] !== undefined ? feedbackState[message.id] : message.feedback;
+                                                                    return (
+                                                                        <div className="flex items-center justify-center">
+                                                                            <AnimatePresence mode="wait">
+                                                                                {!currentFeedback ? (
+                                                                                    <motion.div
+                                                                                        key="actions"
+                                                                                        initial={{ opacity: 0, scale: 0.8 }}
+                                                                                        animate={{ opacity: 1, scale: 1 }}
+                                                                                        exit={{ opacity: 0, scale: 0.8 }}
+                                                                                        transition={{ duration: 0.15 }}
+                                                                                        className="flex flex-row gap-1"
+                                                                                    >
+                                                                                        <Action
+                                                                                            onClick={() => handleFeedback(message.id, "like")}
+                                                                                            label="J'aime"
+                                                                                        >
+                                                                                            <ThumbsUpIcon className="size-3" />
+                                                                                        </Action>
+                                                                                        <Action
+                                                                                            onClick={() => handleFeedback(message.id, "dislike")}
+                                                                                            label="Je n'aime pas"
+                                                                                        >
+                                                                                            <ThumbsDownIcon className="size-3" />
+                                                                                        </Action>
+                                                                                    </motion.div>
+                                                                                ) : (
+                                                                                    <motion.div
+                                                                                        key="check"
+                                                                                        initial={{ opacity: 0, scale: 0.8 }}
+                                                                                        animate={{ opacity: 1, scale: 1 }}
+                                                                                        exit={{ opacity: 0, scale: 0.8 }}
+                                                                                        transition={{ duration: 0.15 }}
+                                                                                    >
+                                                                                        <Action
+                                                                                            onClick={() => handleFeedback(message.id, null)}
+                                                                                            label="Retirer l'avis"
+                                                                                            className="text-emerald-500 opacity-100 dark:text-emerald-400"
+                                                                                        >
+                                                                                            <CheckIcon className="size-3" />
+                                                                                        </Action>
+                                                                                    </motion.div>
+                                                                                )}
+                                                                            </AnimatePresence>
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                            </div>
                                                         </div>
                                                     </Message>
                                                 </Fragment>
@@ -358,7 +458,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                         </div>
                     );
                 })}
-                {((status === "submitted") || (status === "streaming" && messages.at(-1)?.role === "assistant" && (messages.at(-1)?.parts.length === 0 || messages.at(-1)?.parts.every((p: any) => p.type === 'text' ? !p.text : false)))) && <Loader />}
+                {((status === "submitted") || (status === "streaming" && messages.at(-1)?.role === "assistant" && messages.at(-1)?.parts.length === 0)) && <Loader className="mt-2" />}
             </ConversationContent>
             <ConversationScrollButton />
         </Conversation>

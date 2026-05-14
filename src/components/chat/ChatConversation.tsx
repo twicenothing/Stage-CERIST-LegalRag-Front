@@ -42,27 +42,38 @@ const parseTextAndSources = (text: string) => {
 };
 
 const parseSources = (text: string) => {
-    const sources: { title: string; percentage: string }[] = [];
+    const sources: { title: string; percentage: string; page?: string }[] = [];
     const lines = text.split('\n');
     for (const line of lines) {
-        const match = line.match(/-\s*(.*?)\s*\(\s*(?:Pertinence\s*:\s*)?(\d+%?)\s*\)/i);
+        const match = line.match(/-\s*(.*?)\s*(?:-\s*Page\s*(\w+))?\s*\(\s*(?:Pertinence\s*:\s*)?(\d+%?)\s*\)/i);
         if (match) {
-            sources.push({ title: match[1].trim(), percentage: match[2].trim() });
+            sources.push({ 
+                title: match[1].trim(), 
+                page: match[2] ? match[2].trim() : undefined,
+                percentage: match[3].trim() 
+            });
         } else {
             const titleMatch = line.match(/-\s*(.+)/);
             if (titleMatch && titleMatch[1].trim() !== '') {
-                sources.push({ title: titleMatch[1].trim(), percentage: "" });
+                let title = titleMatch[1].trim();
+                let page = undefined;
+                const pageMatch = title.match(/(.*?)\s*-\s*Page\s*(\w+)/i);
+                if (pageMatch) {
+                    title = pageMatch[1].trim();
+                    page = pageMatch[2].trim();
+                }
+                sources.push({ title, percentage: "", page });
             }
         }
     }
     return sources;
 };
 
-const SourcesViewer = ({ sources }: { sources: { title: string; percentage: string }[] }) => {
+const SourcesViewer = ({ sources }: { sources: { title: string; percentage: string; page?: string }[] }) => {
     const [isOpen, setIsOpen] = useState(false);
     if (!sources || sources.length === 0) return null;
 
-    const handleOpenPdf = async (title: string) => {
+    const handleOpenPdf = async (title: string, page?: string) => {
         try {
             const toastId = toast.loading("Ouverture du document...");
             const response = await fetch(`${API_URL}/rag/pdf?title=${encodeURIComponent(title)}`, {
@@ -78,7 +89,8 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
             
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
+            const finalUrl = (page && page !== 'Inconnu' && !isNaN(Number(page))) ? `${url}#page=${page}` : url;
+            window.open(finalUrl, "_blank");
             toast.dismiss(toastId);
         } catch (err) {
             toast.error("Erreur lors de l'ouverture du document");
@@ -105,10 +117,10 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
             </button>
             
             <div className={cn("flex flex-wrap gap-2")}>
-               {(isOpen ? sources : sources.slice(0, 1)).map((s, idx) => (
+                {(isOpen ? sources : sources.slice(0, 1)).map((s, idx) => (
                     <button 
                         key={idx} 
-                        onClick={() => handleOpenPdf(s.title)}
+                        onClick={() => handleOpenPdf(s.title, s.page)}
                         className={cn("flex items-center gap-2 p-1.5 px-2.5 rounded-md border bg-background text-xs shadow-sm w-fit max-w-[280px] cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring", getColorClass(s.percentage))}
                         title={`Ouvrir ${s.title}`}
                     >

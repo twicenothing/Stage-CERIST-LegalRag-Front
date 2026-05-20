@@ -13,7 +13,7 @@ import { useModal } from "@/hooks/use-modal";
 import { useSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { RiAddLine, RiRobot2Line, RiSearchLine, RiBookOpenLine } from "@remixicon/react";
-import { SettingsIcon } from "lucide-react";
+import { SettingsIcon, LayoutDashboardIcon } from "lucide-react";
 import Logo from "../Logo";
 import ChatHistory from "./ChatHistory";
 import { ChatSession } from "@/types/globals";
@@ -73,6 +73,16 @@ const ChatSidebar = ({ sessionId, ...props }: ChatSidebarProps) => {
                                 <span>Rechercher des chats</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
+                        {session.data?.user?.role === "admin" && (
+                            <SidebarMenuItem className="group">
+                                <SidebarMenuButton asChild className="text-foreground font-medium">
+                                    <Link className="group" to="/dashboard">
+                                        <LayoutDashboardIcon className="size-5 mr-2" />
+                                        <span>Tableau de bord</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        )}
                     </SidebarMenu>
                 </SidebarGroup>
                 <ChatHistory />

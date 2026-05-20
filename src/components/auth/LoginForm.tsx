@@ -169,7 +169,7 @@ const LoginForm = () => {
                 onClick={() => setMode("login")}
                 className="text-primary underline-offset-4 hover:underline"
               >
-                Sign in
+                Se connecter
               </button>
             </p>
           </div>
@@ -188,8 +188,7 @@ const LoginForm = () => {
           <img src={logoUrl} alt="CERIST Logo" className="h-28 w-auto object-contain mb-6" />
           <h1 className="text-2xl font-bold">Bienvenue à Légal DjazairIA</h1>
           <p className="text-sm text-muted-foreground">
-            Sign in with your email and password
-          </p>
+Connectez-vous avec votre adresse e-mail et votre mot de passe          </p>
         </div>
         <div className="grid gap-4">
           <FormField
@@ -223,18 +222,9 @@ const LoginForm = () => {
             )}
           />
           <Button isLoading={isSubmitting} type="submit" className="w-full bg-foreground text-background hover:bg-foreground/90 shadow-sm rounded-full">
-            Sign in
+            Se connecter
           </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <button
-              type="button"
-              onClick={() => setMode("register")}
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              Create one
-            </button>
-          </p>
+
         </div>
       </form>
     </Form>

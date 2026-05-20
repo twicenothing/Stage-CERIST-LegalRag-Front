@@ -24,7 +24,6 @@ import { API_URL } from "@/lib/constants";
 import { getToken, useSession } from "@/lib/auth";
 import { getChatSession } from "@/services/chat-sessions";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboardIcon } from "lucide-react";
 
 interface ChatProps {
   sessionId: string;
@@ -199,14 +198,6 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
           </div>
         </SidebarInset>
       </SidebarProvider>
-      {useSession().data?.user?.role === "admin" && (
-        <div className="absolute top-4 right-4 z-50">
-          <Button variant="outline" onClick={() => navigate("/dashboard")} className="shadow-sm gap-2 rounded-full">
-            <LayoutDashboardIcon className="size-4" />
-            <span className="hidden sm:inline">Tableau de bord</span>
-          </Button>
-        </div>
-      )}
     </>
   );
 };

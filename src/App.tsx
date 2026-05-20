@@ -3,13 +3,14 @@ import Router from "./components/Router";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 import { Toaster } from "./components/ui/sonner";
 import "@fontsource-variable/roboto/index.css";
-
+import { TextSelectionDictionary } from "./components/ai-elements/TextSelectionDictionary";
 const App = () => {
   return (
     <TooltipProvider>
       <ThemeProvider>
         <Router />
         <Toaster position="bottom-left" />
+        <TextSelectionDictionary />
       </ThemeProvider>
     </TooltipProvider>
   );

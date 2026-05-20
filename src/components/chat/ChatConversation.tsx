@@ -19,10 +19,11 @@ import {
     SourcesContent,
     SourcesTrigger,
 } from "@/components/ai-elements/sources";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types/globals";
 import type { ChatStatus } from "ai";
-import { CopyIcon, FileIcon, ChevronDownIcon, PencilIcon, ThumbsUpIcon, ThumbsDownIcon, CheckIcon } from "lucide-react";
+import { CopyIcon, FileIcon, ChevronDownIcon, PencilIcon, ThumbsUpIcon, ThumbsDownIcon, CheckIcon, FlagIcon } from "lucide-react";
 import { Fragment, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
@@ -71,6 +72,8 @@ const parseSources = (text: string) => {
 
 const SourcesViewer = ({ sources }: { sources: { title: string; percentage: string; page?: string }[] }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedPdf, setSelectedPdf] = useState<{ url: string; title: string } | null>(null);
+
     if (!sources || sources.length === 0) return null;
 
     const handleOpenPdf = async (title: string, page?: string) => {
@@ -90,7 +93,7 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
             const finalUrl = (page && page !== 'Inconnu' && !isNaN(Number(page))) ? `${url}#page=${page}` : url;
-            window.open(finalUrl, "_blank");
+            setSelectedPdf({ url: finalUrl, title });
             toast.dismiss(toastId);
         } catch (err) {
             toast.error("Erreur lors de l'ouverture du document");
@@ -132,8 +135,25 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
                             </span>
                         )}
                     </button>
-               ))}
+                ))}
             </div>
+
+            <Dialog open={!!selectedPdf} onOpenChange={(open) => !open && setSelectedPdf(null)}>
+                <DialogContent className="max-w-[90vw] w-[1200px] h-[90vh] flex flex-col p-4 sm:p-6 sm:max-w-7xl">
+                    <DialogHeader className="mb-2">
+                        <DialogTitle className="text-xl">{selectedPdf?.title}</DialogTitle>
+                    </DialogHeader>
+                    {selectedPdf && (
+                        <div className="flex-1 w-full bg-muted/30 rounded-lg overflow-hidden border">
+                            <iframe 
+                                src={selectedPdf.url} 
+                                className="w-full h-full border-0" 
+                                title={selectedPdf.title}
+                            />
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
@@ -335,6 +355,12 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                                                             label="Je n'aime pas"
                                                                                         >
                                                                                             <ThumbsDownIcon className="size-3" />
+                                                                                        </Action>
+                                                                                        <Action
+                                                                                            onClick={() => {}}
+                                                                                            label="Signaler un problème"
+                                                                                        >
+                                                                                            <FlagIcon className="size-3" />
                                                                                         </Action>
                                                                                     </motion.div>
                                                                                 ) : (

@@ -1,73 +1,133 @@
 import { motion } from "motion/react";
 import { PageHeader, PageContent } from "@/components/layout/PageLayout";
-import { RiInformationLine, RiLightbulbLine, RiQuestionAnswerLine } from "@remixicon/react";
 
 export default function Overview() {
     return (
         <div className="min-h-screen pb-28">
             <PageHeader
-                title="Guide d'utilisation"
-                subtitle="Comment utiliser l'assistant"
+                title="Bienvenue sur Légale DjazairIA 🇩🇿"
+                subtitle="Guide d'utilisation et bonnes pratiques"
                 showBackButton
             />
 
-            <PageContent maxWidth="2xl" className="space-y-10">
+            <PageContent maxWidth="3xl" className="space-y-12 mt-8">
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="flex flex-col gap-8"
+                    className="flex flex-col gap-12"
                 >
-                    {/* Intro */}
-                    <div className="bg-card text-card-foreground p-6 rounded-2xl border border-border/50 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4 text-primary">
-                            <RiInformationLine className="size-6" />
-                            <h2 className="text-lg font-bold">À propos du site</h2>
+                    {/* Section 1 */}
+                    <section className="space-y-6">
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-bold text-foreground">À propos de l'assistant</h2>
+                            <div className="h-px w-full bg-border/50" />
                         </div>
-                        <p className="text-muted-foreground leading-relaxed">
-                            Ce site est un chatbot interactif conçu pour répondre à vos questions juridiques concernant le droit algérien. 
-                            Que vous soyez un professionnel du droit ou un citoyen cherchant à comprendre ses droits, 
-                            notre assistant utilise l'intelligence artificielle pour vous fournir des réponses claires, basées sur la législation en vigueur.
-                        </p>
-                    </div>
 
-                    {/* How to use */}
-                    <div className="bg-card text-card-foreground p-6 rounded-2xl border border-border/50 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4 text-primary">
-                            <RiQuestionAnswerLine className="size-6" />
-                            <h2 className="text-lg font-bold">Comment l'utiliser</h2>
-                        </div>
-                        <ul className="space-y-3 text-muted-foreground list-disc pl-5">
-                            <li>Posez votre question directement dans la barre de chat.</li>
-                            <li>Vous pouvez demander des explications sur un article de loi spécifique.</li>
-                            <li>Consultez l'historique de vos conversations dans le panneau latéral.</li>
-                            <li>Recherchez parmi vos anciens chats pour retrouver une information juridique importante.</li>
-                        </ul>
-                    </div>
+                        <div className="space-y-6 text-muted-foreground leading-relaxed">
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-foreground">Qu'est-ce que Légale DjazairIA ?</h3>
+                                <p>
+                                    Légale DjazairIA est votre assistant juridique intelligent. Conçu pour simplifier l'accès à l'information légale algérienne, il vous permet d'interroger les textes du Journal Officiel en langage naturel.
+                                </p>
+                            </div>
 
-                    {/* Tips */}
-                    <div className="bg-card text-card-foreground p-6 rounded-2xl border border-border/50 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4 text-primary">
-                            <RiLightbulbLine className="size-6" />
-                            <h2 className="text-lg font-bold">Conseils pour de meilleurs résultats</h2>
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-foreground">Comment ça marche ?</h3>
+                                <p>
+                                    Contrairement à un simple moteur de recherche, cet outil s'appuie sur l'Intelligence Artificielle pour analyser votre question, rechercher les articles de loi pertinents dans notre base de données sécurisée, et générer une réponse de synthèse claire. Chaque information fournie est systématiquement accompagnée de sa source officielle pour garantir une fiabilité et une transparence totales.
+                                </p>
+                                <p className="mt-2 text-primary font-medium">
+                                    À savoir : Chaque réponse est suivie d'un pourcentage de pertinence indiquant le degré de certitude de l'IA quant à la provenance de l'information pour chaque document affiché. De plus, les documents PDF sont cliquables pour vous permettre de consulter directement la source en question.
+                                </p>
+                            </div>
                         </div>
-                        <div className="space-y-4 text-muted-foreground">
-                            <p>
-                                Pour aider l'assistant à fournir la réponse la plus précise possible, veuillez prendre en compte ces conseils :
-                            </p>
-                            <ul className="space-y-3 list-disc pl-5">
-                                <li>
-                                    <strong className="text-foreground">Fournissez du contexte :</strong> Expliquez brièvement la situation (ex: un litige commercial, un problème immobilier, une question de droit de travail).
-                                </li>
-                                <li>
-                                    <strong className="text-foreground">Citez des textes si possible :</strong> Si vous connaissez déjà le titre de la loi, du décret, ou de l'ordonnance, mentionnez-le pour que l'assistant puisse s'y référer directement.
-                                </li>
-                                <li>
-                                    <strong className="text-foreground">Soyez précis :</strong> Plus votre question est ciblée, plus la réponse sera détaillée et pertinente.
-                                </li>
-                            </ul>
+                    </section>
+
+                    {/* Section 2 */}
+                    <section className="space-y-6">
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-bold text-foreground">Bonnes pratiques</h2>
+                            <div className="h-px w-full bg-border/50" />
                         </div>
-                    </div>
+
+                        <div className="space-y-6 text-muted-foreground leading-relaxed">
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-foreground">Comment formuler vos questions pour obtenir les meilleurs résultats ?</h3>
+                                <p>
+                                    Pour exploiter tout le potentiel de l'assistant, voici quelques conseils lors de la rédaction de vos requêtes :
+                                </p>
+                                
+                                <ul className="space-y-4 pl-2">
+                                    <li className="flex flex-col gap-1">
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-primary mt-1">•</span>
+                                            <strong className="text-foreground">Soyez précis et contextualisez :</strong>
+                                        </div>
+                                        <span className="pl-5">Plus vous donnez de détails, meilleure sera la réponse.</span>
+                                        <div className="pl-5 mt-2 flex flex-col sm:flex-row gap-2">
+                                            <div className="flex flex-col border border-destructive/20 bg-destructive/5 rounded-md p-3 text-sm flex-1">
+                                                <span className="font-semibold text-destructive mb-1">Moins efficace :</span>
+                                                <span className="italic text-foreground">"Congé maternité"</span>
+                                            </div>
+                                            <div className="flex flex-col border border-emerald-500/20 bg-emerald-500/5 rounded-md p-3 text-sm flex-1">
+                                                <span className="font-semibold text-emerald-600 mb-1">Plus efficace :</span>
+                                                <span className="italic text-foreground">"Quelle est la durée légale du congé maternité pour une employée dans le secteur privé ?"</span>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-primary mt-1">•</span>
+                                        <span>
+                                            <strong className="text-foreground">Posez une seule question à la fois :</strong> Si vous avez plusieurs interrogations, séparez-les en plusieurs requêtes distinctes pour éviter de diluer la recherche.
+                                        </span>
+                                    </li>
+
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-primary mt-1">•</span>
+                                        <span>
+                                            <strong className="text-foreground">Mentionnez les références si vous les connaissez :</strong> Si votre question porte sur une loi spécifique, incluez son numéro ou son année (ex: "Selon la loi de finances 2023...").
+                                        </span>
+                                    </li>
+
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-primary mt-1">•</span>
+                                        <span>
+                                            <strong className="text-foreground">Vérifiez toujours les sources :</strong> Bien que l'assistant soit conçu pour minimiser les erreurs, il est primordial de cliquer sur les références fournies (numéro de loi, article, page du JO) à la fin de chaque réponse pour lire le texte brut et confirmer l'information. L'IA vous assiste, mais ne remplace pas l'expertise humaine.
+                                        </span>
+                                    </li>
+
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-primary mt-1">•</span>
+                                        <span>
+                                            <strong className="text-foreground">Reformulez en cas de doute :</strong> Si la réponse ne correspond pas exactement à vos attentes, essayez de formuler votre question différemment en utilisant d'autres termes juridiques.
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Section 3 */}
+                    <section className="space-y-6">
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-bold text-foreground">Aidez-nous à nous améliorer</h2>
+                            <div className="h-px w-full bg-border/50" />
+                        </div>
+
+                        <div className="space-y-6 text-muted-foreground leading-relaxed">
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-foreground">Évaluez les réponses de l'IA</h3>
+                                <p>
+                                    Afin d'améliorer continuellement la qualité et la précision de notre assistant, nous vous invitons à utiliser les boutons <strong>"J'aime"</strong> et <strong>"Je n'aime pas"</strong> situés sous chaque réponse générée par l'IA.
+                                </p>
+                                <p>
+                                    Vos retours sont précieux : ils permettent à notre équipe d'identifier les réponses les plus pertinentes et d'ajuster notre système pour mieux répondre à vos besoins juridiques à l'avenir.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
                 </motion.div>
             </PageContent>
         </div>

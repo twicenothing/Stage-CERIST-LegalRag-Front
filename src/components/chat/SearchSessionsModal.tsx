@@ -9,11 +9,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/hooks/use-modal";
 import { getUserChatSessions } from "@/services/chat-sessions";
-import { Delete02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { RiSearchLine } from "@remixicon/react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { Spinner } from "../ui/spinner";
 import { ChatSession } from "@/types/globals";
@@ -22,77 +20,53 @@ import { Link } from "react-router-dom";
 const SearchSessionsModal = () => {
     const { isOpen, toggle, actionData } = useModal("SEARCH_CHAT_SESSIONS");
     const [searchValue, setSearchValue] = useState("");
-    const [debouncedSearchValue] = useDebounceValue(searchValue, 500);
+    const [debouncedSearchValue] = useDebounceValue(searchValue, 300);
 
-    const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useInfiniteQuery({
-            queryKey: ["chat-sessions-history-search", debouncedSearchValue],
-            queryFn: ({ pageParam = 1 }) => {
-                return getUserChatSessions(
-                    pageParam as number,
-                    10,
-                    debouncedSearchValue,
-                );
-            },
-            getNextPageParam: (
-                lastPage: Pick<ChatSession, "id" | "title">[],
-                allPages: Pick<ChatSession, "id" | "title">[][],
-            ) => {
-                return lastPage.length === 10 ? allPages.length + 1 : undefined;
-            },
-            initialPageParam: 1,
-            enabled: isOpen("SEARCH_CHAT_SESSIONS"),
-        });
+    const { data: allSessions, isLoading } = useQuery({
+        queryKey: ["chat-sessions-history"],
+        queryFn: getUserChatSessions,
+        enabled: isOpen("SEARCH_CHAT_SESSIONS"),
+    });
 
-    const sessions =
-        data?.pages
-            .flatMap((p) => p)
-            .filter((s) => s.id !== actionData?.currentSessionId) || [];
-
-    const handleDelete = (
-        e: React.MouseEvent,
-        sessionId: ChatSession["id"],
-        sessionTitle: string,
-    ) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        toggle("DELETE_SESSION_CONFIRMATION", {
-            sessionId,
-            sessionTitle,
-            fromSearch: true,
-        });
-    };
+    const sessions = useMemo(() => {
+        if (!allSessions) return [];
+        let filtered = allSessions.filter((s) => s.id !== actionData?.currentSessionId);
+        if (debouncedSearchValue) {
+            const lowerQuery = debouncedSearchValue.toLowerCase();
+            filtered = filtered.filter(s => s.title.toLowerCase().includes(lowerQuery));
+        }
+        return filtered;
+    }, [allSessions, debouncedSearchValue, actionData?.currentSessionId]);
 
     return (
         <Dialog
             open={isOpen("SEARCH_CHAT_SESSIONS")}
             onOpenChange={() => toggle("SEARCH_CHAT_SESSIONS")}
         >
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
+            <DialogContent className="w-[95vw] max-w-md overflow-hidden flex flex-col p-6">
+                <DialogHeader className="shrink-0">
                     <DialogTitle>Rechercher des sessions</DialogTitle>
                     <DialogDescription>
                         Recherchez dans l'historique de vos sessions.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                    <div className="relative">
+                <div className="space-y-4 flex flex-col overflow-hidden min-h-0 w-full">
+                    <div className="relative shrink-0 w-full">
                         <RiSearchLine className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Rechercher des chats..."
-                            className="pl-9"
+                            className="pl-9 w-full"
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                         />
                     </div>
-                    <div className="h-75 overflow-y-auto space-y-2 pr-1">
+                    <div className="max-h-[50vh] overflow-y-auto overflow-x-hidden space-y-2 pr-1 w-full min-h-0">
                         {isLoading ? (
-                            <div className="flex h-full items-center justify-center">
+                            <div className="flex h-full items-center justify-center py-4">
                                 <Spinner className="size-6" />
                             </div>
                         ) : sessions.length > 0 ? (
-                            <>
+                            <div className="flex flex-col gap-2 w-full">
                                 {sessions.map((session) => (
                                     <Link
                                         key={session.id}
@@ -100,41 +74,18 @@ const SearchSessionsModal = () => {
                                         onClick={() =>
                                             toggle("SEARCH_CHAT_SESSIONS")
                                         }
-                                        className="flex items-center justify-between gap-2 rounded-lg border p-3 hover:bg-muted transition-colors"
+                                        className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3 hover:bg-muted transition-colors w-full overflow-hidden"
                                     >
-                                        <span className="font-medium truncate flex-1 text-left">
-                                            {session.title}
-                                        </span>
-                                        <button
-                                            className="shrink-0"
-                                            onClick={(e) =>
-                                                handleDelete(e, session.id, session.title)
-                                            }
-                                        >
-                                            <HugeiconsIcon
-                                                strokeWidth={2}
-                                                className="size-4 text-destructive hover:text-destructive/80"
-                                                icon={Delete02Icon}
-                                            />
-                                        </button>
+                                        <div className="flex-1 min-w-0 overflow-hidden">
+                                            <span className="font-medium truncate block text-left w-full text-sm">
+                                                {session.title}
+                                            </span>
+                                        </div>
                                     </Link>
                                 ))}
-                                {hasNextPage && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="w-full"
-                                        onClick={() => fetchNextPage()}
-                                        disabled={isFetchingNextPage}
-                                    >
-                                        {isFetchingNextPage
-                                            ? "Chargement..."
-                                            : "Charger plus"}
-                                    </Button>
-                                )}
-                            </>
+                            </div>
                         ) : (
-                            <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
+                            <div className="flex h-full flex-col items-center justify-center gap-2 py-8 text-center text-sm text-muted-foreground">
                                 <p>Aucune session trouvée</p>
                             </div>
                         )}

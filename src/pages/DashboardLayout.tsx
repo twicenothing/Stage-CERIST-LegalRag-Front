@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/auth";
 import { Navigate, useNavigate, Outlet, useLocation, Link } from "react-router-dom";
-import { ArrowLeftIcon, UsersIcon, BarChart3Icon } from "lucide-react";
+import { ArrowLeftIcon, UsersIcon, BarChart3Icon, FlagIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,11 @@ const DashboardLayout = () => {
             name: "Statistiques",
             href: "/dashboard/statistics",
             icon: BarChart3Icon,
+        },
+        {
+            name: "Signalements",
+            href: "/dashboard/reports",
+            icon: FlagIcon,
         },
     ];
 

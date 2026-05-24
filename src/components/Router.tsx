@@ -8,6 +8,7 @@ import Overview from "@/pages/Overview";
 import DashboardLayout from "@/pages/DashboardLayout";
 import UsersDashboard from "@/pages/UsersDashboard";
 import StatisticsDashboard from "@/pages/StatisticsDashboard";
+import ReportsDashboard from "@/pages/ReportsDashboard";
 import { Navigate } from "react-router-dom";
 
 const Router = () => {
@@ -21,6 +22,7 @@ const Router = () => {
           <Route index element={<Navigate to="/dashboard/users" replace />} />
           <Route path="users" element={<UsersDashboard />} />
           <Route path="statistics" element={<StatisticsDashboard />} />
+          <Route path="reports" element={<ReportsDashboard />} />
         </Route>
       </Route>
       <Route element={<AuthRoute />}>

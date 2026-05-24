@@ -24,5 +24,6 @@ export interface ChatSession {
     id: string;
     title: string;
     user_id: string;
+    archived: boolean;
     created_at: Date;
 }

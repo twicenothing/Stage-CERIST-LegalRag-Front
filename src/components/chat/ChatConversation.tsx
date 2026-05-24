@@ -24,11 +24,12 @@ import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/types/globals";
 import type { ChatStatus } from "ai";
 import { CopyIcon, FileIcon, ChevronDownIcon, PencilIcon, ThumbsUpIcon, ThumbsDownIcon, CheckIcon, FlagIcon } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { API_URL } from "@/lib/constants";
 import { getToken } from "@/lib/auth";
+import { ReportMessagePopover } from "./ReportMessagePopover";
 
 const parseTextAndSources = (text: string) => {
     const match = text.match(/^(.*?)(?:\n\n)?\*\*Documents pertinents\s*:\*\*(.*)$/is);
@@ -158,6 +159,43 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
     );
 };
 
+const PROGRESSIVE_STATES = [
+    "🔍 Recherche dans le Journal Officiel...",
+    "⚖️ Analyse des articles de loi...",
+    "✍️ Rédaction de la réponse..."
+];
+
+const ProgressiveLoader = () => {
+    const [stateIndex, setStateIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setStateIndex((prev) => Math.min(prev + 1, PROGRESSIVE_STATES.length - 1));
+        }, 1800);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="flex items-center gap-3 text-sm text-muted-foreground font-medium w-full min-w-[280px]">
+            <Loader className="size-4 shrink-0 text-primary" />
+            <div className="relative flex-1 overflow-hidden h-5 flex items-center">
+                <AnimatePresence mode="popLayout">
+                    <motion.div
+                        key={stateIndex}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="absolute whitespace-nowrap"
+                    >
+                        {PROGRESSIVE_STATES[stateIndex]}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+        </div>
+    );
+};
+
 interface ChatConversationProps {
     messages: ChatMessage[];
     status: ChatStatus;
@@ -166,6 +204,7 @@ interface ChatConversationProps {
 
 const ChatConversation = ({ messages, status, onEditClick }: ChatConversationProps) => {
     const [feedbackState, setFeedbackState] = useState<Record<string, "like" | "dislike" | null>>({});
+    const [reportedMessages, setReportedMessages] = useState<Set<string>>(new Set());
 
     const handleFeedback = async (messageId: string, feedback: "like" | "dislike" | null) => {
         if (!messageId || messageId.length < 32) {
@@ -291,7 +330,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                             <Message from={message.role} className="group items-start">
                                                                 <div className="flex flex-col w-full">
                                                                     <MessageContent variant="contained" className="w-fit max-w-full px-5 py-4">
-                                                                        <Loader className="text-muted-foreground" />
+                                                                        <ProgressiveLoader />
                                                                     </MessageContent>
                                                                 </div>
                                                             </Message>
@@ -310,7 +349,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                         className="group items-start"
                                                     >
                                                         <div className="flex flex-col w-full">
-                                                            <MessageContent variant="contained" className="w-fit max-w-full">
+                                                            <MessageContent variant="contained" className={cn("w-fit max-w-full", reportedMessages.has(message.id) && "opacity-50 grayscale transition-all duration-300")}>
                                                                 <Response>
                                                                     {mainText}
                                                                 </Response>
@@ -356,12 +395,18 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                                                         >
                                                                                             <ThumbsDownIcon className="size-3" />
                                                                                         </Action>
-                                                                                        <Action
-                                                                                            onClick={() => {}}
-                                                                                            label="Signaler un problème"
+                                                                                        <ReportMessagePopover
+                                                                                            messageId={message.id}
+                                                                                            onReportSuccess={(id) => setReportedMessages(prev => new Set(prev).add(id))}
+                                                                                            disabled={reportedMessages.has(message.id)}
                                                                                         >
-                                                                                            <FlagIcon className="size-3" />
-                                                                                        </Action>
+                                                                                            <Action
+                                                                                                onClick={() => {}}
+                                                                                                label={reportedMessages.has(message.id) ? "Déjà signalé" : "Signaler un problème"}
+                                                                                            >
+                                                                                                <FlagIcon className="size-3" />
+                                                                                            </Action>
+                                                                                        </ReportMessagePopover>
                                                                                     </motion.div>
                                                                                 ) : (
                                                                                     <motion.div

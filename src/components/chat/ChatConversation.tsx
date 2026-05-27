@@ -179,18 +179,12 @@ const ProgressiveLoader = () => {
         <div className="flex items-center gap-3 text-sm text-muted-foreground font-medium w-full min-w-[280px]">
             <Loader className="size-4 shrink-0 text-primary" />
             <div className="relative flex-1 overflow-hidden h-5 flex items-center">
-                <AnimatePresence mode="popLayout">
-                    <motion.div
-                        key={stateIndex}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -15 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="absolute whitespace-nowrap"
-                    >
-                        {PROGRESSIVE_STATES[stateIndex]}
-                    </motion.div>
-                </AnimatePresence>
+                <div
+                    key={stateIndex}
+                    className="absolute whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300"
+                >
+                    {PROGRESSIVE_STATES[stateIndex]}
+                </div>
             </div>
         </div>
     );

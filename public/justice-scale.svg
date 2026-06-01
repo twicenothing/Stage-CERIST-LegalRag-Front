@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Justice scale">
+    <rect width="64" height="64" rx="14" fill="#19362d" />
+    <circle cx="32" cy="17" r="4" fill="#84e0b7" />
+    <path
+        d="M32 21v26M21 47h22M26 55h12M17 25h30M32 25l-13 5M32 25l13 5"
+        fill="none"
+        stroke="#f8fafc"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M13 30h12l-3 8h-6l-3-8ZM39 30h12l-3 8h-6l-3-8Z"
+        fill="#84e0b7"
+        stroke="#f8fafc"
+        stroke-width="3"
+        stroke-linejoin="round"
+    />
+</svg>

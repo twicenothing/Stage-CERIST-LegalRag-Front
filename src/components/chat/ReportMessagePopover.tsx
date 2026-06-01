@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Popover } from "radix-ui";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,74 @@ export const ReportMessagePopover = ({ messageId, children, onReportSuccess, dis
     const [reason, setReason] = useState("");
     const [details, setDetails] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const dragState = useRef({
+        startX: 0,
+        startY: 0,
+        originX: 0,
+        originY: 0,
+        minX: 0,
+        maxX: 0,
+        minY: 0,
+        maxY: 0,
+    });
+
+    useEffect(() => {
+        if (!isOpen) {
+            setPosition({ x: 0, y: 0 });
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isDragging) return;
+
+        const handlePointerMove = (event: PointerEvent) => {
+            const nextX = dragState.current.originX + event.clientX - dragState.current.startX;
+            const nextY = dragState.current.originY + event.clientY - dragState.current.startY;
+
+            setPosition({
+                x: Math.min(Math.max(nextX, dragState.current.minX), dragState.current.maxX),
+                y: Math.min(Math.max(nextY, dragState.current.minY), dragState.current.maxY),
+            });
+        };
+
+        const handlePointerUp = () => setIsDragging(false);
+
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+        window.addEventListener("pointercancel", handlePointerUp);
+
+        return () => {
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+            window.removeEventListener("pointercancel", handlePointerUp);
+        };
+    }, [isDragging]);
+
+    const handleDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (event.button !== 0 || !contentRef.current) return;
+
+        const viewportMargin = 8;
+        const rect = contentRef.current.getBoundingClientRect();
+        const baseLeft = rect.left - position.x;
+        const baseTop = rect.top - position.y;
+
+        dragState.current = {
+            startX: event.clientX,
+            startY: event.clientY,
+            originX: position.x,
+            originY: position.y,
+            minX: viewportMargin - baseLeft,
+            maxX: window.innerWidth - viewportMargin - rect.width - baseLeft,
+            minY: viewportMargin - baseTop,
+            maxY: window.innerHeight - viewportMargin - rect.height - baseTop,
+        };
+
+        setIsDragging(true);
+        event.preventDefault();
+    };
 
     const handleSubmit = async () => {
         if (!reason) {
@@ -50,8 +118,9 @@ export const ReportMessagePopover = ({ messageId, children, onReportSuccess, dis
             setReason("");
             setDetails("");
             onReportSuccess(messageId);
-        } catch (error: any) {
-            toast.error(error.message || "Erreur lors de l'envoi du signalement");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Erreur lors de l'envoi du signalement";
+            toast.error(message);
         } finally {
             setIsSubmitting(false);
         }
@@ -69,13 +138,22 @@ export const ReportMessagePopover = ({ messageId, children, onReportSuccess, dis
             </Popover.Trigger>
             <Popover.Portal>
                 <Popover.Content
+                    ref={contentRef}
                     side="bottom"
                     align="end"
                     sideOffset={8}
-                    className="z-50 w-80 rounded-2xl border bg-popover p-4 text-popover-foreground shadow-2xl outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                    style={{ transform: `translate3d(${position.x}px, ${position.y}px, 0)` }}
+                    className={cn(
+                        "z-50 w-80 rounded-2xl border bg-popover p-4 text-popover-foreground shadow-2xl outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+                        isDragging && "select-none"
+                    )}
                 >
                     <div className="flex flex-col gap-4">
-                        <div className="space-y-2">
+                        <div
+                            className={cn("space-y-2 cursor-grab touch-none", isDragging && "cursor-grabbing")}
+                            onPointerDown={handleDragStart}
+                            title="Déplacer"
+                        >
                             <h4 className="font-medium leading-none">Signaler un problème</h4>
                             <p className="text-sm text-muted-foreground">
                                 Aidez-nous à améliorer la qualité des réponses.

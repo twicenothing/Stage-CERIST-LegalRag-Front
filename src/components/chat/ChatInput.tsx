@@ -53,6 +53,7 @@ const ChatInput = ({
                     placeholder={placeholder}
                     onChange={(e) => setInput(e.target.value)}
                     value={input}
+                    disabled={status === "submitted" || status === "streaming"}
                 />
             </PromptInputBody>
             <PromptInputFooter>
@@ -64,26 +65,9 @@ const ChatInput = ({
                         // }
                         />
                     </PromptInputActionMenu>
-                    {/* <button
-                        type="button"
-                     
-                        className={cn(
-                            "rounded-full flex items-center gap-1.5 px-3 py-2 transition-colors",
-                            webSearch
-                                ? "bg-secondary text-secondary-foreground"
-                                : "bg-muted text-muted-foreground hover:bg-muted/50",
-                        )}
-                    >
-                        <HugeiconsIcon
-                            strokeWidth={2}
-                            icon={GlobalSearchIcon}
-                            className="size-4"
-                        />
-                        <span>Search</span>
-                    </button> */}
                 </PromptInputTools>
                 <PromptInputSubmit
-                    disabled={!input && status !== "ready"}
+                    disabled={(!input && status === "ready") || status === "submitted" || status === "streaming"}
                     status={status}
                 />
             </PromptInputFooter>

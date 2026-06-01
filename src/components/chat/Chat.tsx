@@ -9,8 +9,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import objectionImg from "@/assets/objection.jpg";
 import { toast } from "sonner";
 import ChatConversation from "./ChatConversation";
 import { DefaultChatTransport } from "ai";
@@ -35,6 +36,7 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
   const navigate = useNavigate();
 
   const [input, setInput] = useState("");
+  const [showObjection, setShowObjection] = useState(false);
   const queryClient = useQueryClient();
 
   const { messages, setMessages, sendMessage, status } = useChat({
@@ -112,6 +114,11 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
 
     if (!(hasText || hasAttachments)) {
       return;
+    }
+
+    if (message.text?.trim().toLowerCase() === "objection") {
+      setShowObjection(true);
+      setTimeout(() => setShowObjection(false), 1500);
     }
 
     sendMessage(
@@ -196,6 +203,24 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
               )}
             </motion.div>
           </div>
+          
+          <AnimatePresence>
+            {showObjection && (
+              <motion.div
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 15, stiffness: 100 }}
+                className="absolute bottom-24 left-4 md:left-8 z-[100] pointer-events-none"
+              >
+                <img 
+                  src={objectionImg} 
+                  alt="Objection!" 
+                  className="max-h-[200px] max-w-[250px] object-contain drop-shadow-2xl" 
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </SidebarInset>
       </SidebarProvider>
     </>

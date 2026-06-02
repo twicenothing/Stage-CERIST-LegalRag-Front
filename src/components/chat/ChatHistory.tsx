@@ -32,7 +32,6 @@ const SessionList = ({ archived }: { archived: boolean }) => {
   const currentSessionId = searchParams.get("sessionId");
   const { toggle } = useModal();
   const queryClient = useQueryClient();
-
   const { data: allSessions, isLoading } = useQuery({
       queryKey: ["chat-sessions-history"],
       queryFn: getUserChatSessions,

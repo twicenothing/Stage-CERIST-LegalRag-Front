@@ -11,10 +11,8 @@ export type MessageProps = HTMLAttributes<HTMLDivElement> & {
 export const Message = ({ className, from, ...props }: MessageProps) => (
 	<div
 		className={cn(
-			"group flex w-full items-end justify-end gap-2 py-4",
-			from === "user"
-				? "is-user"
-				: "is-assistant flex-row-reverse justify-end",
+			"group flex w-full items-end gap-2 py-3",
+			from === "user" ? "is-user justify-end" : "is-assistant justify-start",
 			className
 		)}
 		{...props}
@@ -22,16 +20,21 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
 );
 
 const messageContentVariants = cva(
-	"is-user:dark flex flex-col gap-2 overflow-hidden rounded-lg text-sm",
+	"relative flex flex-col gap-2 overflow-hidden rounded-2xl px-4 py-3 text-[15px] leading-7 shadow-sm transition-all duration-200",
 	{
 		variants: {
 			variant: {
 				contained: [
-					"max-w-[80%] px-4 py-3 bg-background border shadow-sm text-foreground",
+					"group-[.is-user]:max-w-[82%] group-[.is-user]:rounded-br-md group-[.is-user]:border group-[.is-user]:border-primary/20 group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground group-[.is-user]:shadow-[0_16px_35px_-24px_rgba(16,185,129,0.85)]",
+					"sm:group-[.is-user]:max-w-[72%]",
+					"group-[.is-assistant]:max-w-[92%] group-[.is-assistant]:rounded-bl-md group-[.is-assistant]:border group-[.is-assistant]:border-border/70 group-[.is-assistant]:bg-card/95 group-[.is-assistant]:text-foreground group-[.is-assistant]:ring-1 group-[.is-assistant]:ring-foreground/5 group-[.is-assistant]:shadow-[0_18px_45px_-34px_rgba(15,23,42,0.7)]",
+					"sm:group-[.is-assistant]:max-w-[86%]",
+					"group-[.is-user]:[&_a]:text-primary-foreground group-[.is-user]:[&_a]:decoration-primary-foreground/60 group-[.is-user]:[&_code]:bg-primary-foreground/15 group-[.is-user]:[&_code]:text-primary-foreground",
 				],
 				flat: [
-					"group-[.is-user]:max-w-[80%] group-[.is-user]:bg-secondary group-[.is-user]:px-4 group-[.is-user]:py-3 group-[.is-user]:text-foreground",
-					"group-[.is-assistant]:text-foreground",
+					"group-[.is-user]:max-w-[82%] group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:bg-primary/10 group-[.is-user]:text-foreground",
+					"sm:group-[.is-user]:max-w-[72%]",
+					"group-[.is-assistant]:max-w-[92%] group-[.is-assistant]:text-foreground sm:group-[.is-assistant]:max-w-[86%]",
 				],
 			},
 		},

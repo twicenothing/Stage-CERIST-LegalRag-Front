@@ -1,4 +1,4 @@
-import { Action, Actions } from "@/components/ai-elements/actions";
+import { Action } from "@/components/ai-elements/actions";
 import {
     Conversation,
     ConversationContent,
@@ -96,7 +96,7 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
             const finalUrl = (page && page !== 'Inconnu' && !isNaN(Number(page))) ? `${url}#page=${page}` : url;
             setSelectedPdf({ url: finalUrl, title });
             toast.dismiss(toastId);
-        } catch (err) {
+        } catch {
             toast.error("Erreur lors de l'ouverture du document");
         }
     };
@@ -111,7 +111,7 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
     };
 
     return (
-        <div className="flex flex-col gap-1.5 mt-2 w-full max-w-[90%]">
+        <div className="flex w-fit max-w-[92%] flex-col gap-1.5 pl-1 pt-2 sm:max-w-[86%]">
             <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors w-fit p-1 -ml-1 rounded hover:bg-muted/50"
@@ -221,7 +221,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
             if (!response.ok) {
                 throw new Error("Erreur de feedback");
             }
-        } catch (err) {
+        } catch {
             setFeedbackState(prev => {
                 const newState = { ...prev };
                 delete newState[messageId];
@@ -234,7 +234,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
     return (
         <Conversation className="h-full">
             <ConversationContent className="max-md:p-2">
-                {messages.map((message, messageIndex) => {
+                {messages.map((message) => {
                     // const toolCalls = getToolCalls(message);
                     return (
                         <div key={message.id}>
@@ -323,7 +323,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                         <Fragment key={`${message.id}-${i}`}>
                                                             <Message from={message.role} className="group items-start">
                                                                 <div className="flex flex-col w-full">
-                                                                    <MessageContent variant="contained" className="w-fit max-w-full px-5 py-4">
+                                                                    <MessageContent variant="contained" className="w-fit px-5 py-4">
                                                                         <ProgressiveLoader />
                                                                     </MessageContent>
                                                                 </div>
@@ -343,7 +343,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                         className="group items-start"
                                                     >
                                                         <div className="flex flex-col w-full">
-                                                            <MessageContent variant="contained" className={cn("w-fit max-w-full", reportedMessages.has(message.id) && "opacity-50 grayscale transition-all duration-300")}>
+                                                            <MessageContent variant="contained" className={cn("w-fit", reportedMessages.has(message.id) && "opacity-50 grayscale transition-all duration-300")}>
                                                                 <Response>
                                                                     {mainText}
                                                                 </Response>

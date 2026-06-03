@@ -7,12 +7,15 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useSession } from "@/lib/auth";
 import { logout } from "@/services/auth";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function AccountDetailsSection() {
     const { data: session } = useSession();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const handleLogout = () => {
+        queryClient.clear();
         logout();
         navigate("/login");
     };

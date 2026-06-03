@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -14,18 +13,20 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import { Spinner } from "../ui/spinner";
-import { ChatSession } from "@/types/globals";
 import { Link } from "react-router-dom";
+import { useSession } from "@/lib/auth";
 
 const SearchSessionsModal = () => {
     const { isOpen, toggle, actionData } = useModal("SEARCH_CHAT_SESSIONS");
+    const { data: session } = useSession();
+    const userKey = session?.user.id || session?.user.email;
     const [searchValue, setSearchValue] = useState("");
     const [debouncedSearchValue] = useDebounceValue(searchValue, 300);
 
     const { data: allSessions, isLoading } = useQuery({
-        queryKey: ["chat-sessions-history"],
+        queryKey: ["chat-sessions-history", userKey],
         queryFn: getUserChatSessions,
-        enabled: isOpen("SEARCH_CHAT_SESSIONS"),
+        enabled: !!userKey && isOpen("SEARCH_CHAT_SESSIONS"),
     });
 
     const sessions = useMemo(() => {

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -20,27 +19,42 @@ import {
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
-import { ChatSession } from "@/types/globals";
 import { Link, useSearchParams } from "react-router-dom";
 import { useModal } from "@/hooks/use-modal";
 import { toast } from "sonner";
-import { MoreHorizontalIcon, ArchiveIcon, TrashIcon, ArchiveRestoreIcon, ChevronRightIcon } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useSession } from "@/lib/auth";
+import {
+  MoreHorizontalIcon,
+  ArchiveIcon,
+  TrashIcon,
+  ArchiveRestoreIcon,
+  ChevronRightIcon,
+} from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const SessionList = ({ archived }: { archived: boolean }) => {
   const [searchParams] = useSearchParams();
   const currentSessionId = searchParams.get("sessionId");
+  const { data: session } = useSession();
+  const userKey = session?.user.id || session?.user.email;
   const { toggle } = useModal();
   const queryClient = useQueryClient();
+
   const { data: allSessions, isLoading } = useQuery({
-      queryKey: ["chat-sessions-history"],
-      queryFn: getUserChatSessions,
+    queryKey: ["chat-sessions-history", userKey],
+    queryFn: getUserChatSessions,
+    enabled: !!userKey,
   });
 
-  const sessions = allSessions?.filter(s => !!s.archived === archived) || [];
+  const sessions = allSessions?.filter((s) => !!s.archived === archived) || [];
 
   const archiveMutation = useMutation({
-    mutationFn: (id: string) => archived ? unarchiveChatSession(id) : archiveChatSession(id),
+    mutationFn: (id: string) =>
+      archived ? unarchiveChatSession(id) : archiveChatSession(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chat-sessions-history"] });
       toast.success(archived ? "Session désarchivée" : "Session archivée");
@@ -77,7 +91,7 @@ const SessionList = ({ archived }: { archived: boolean }) => {
                 className={cn(
                   isActive
                     ? "border border-border text-foreground font-medium bg-secondary/50"
-                    : "text-muted-foreground"
+                    : "text-muted-foreground",
                 )}
               >
                 <div className="flex items-center justify-between w-full gap-0">

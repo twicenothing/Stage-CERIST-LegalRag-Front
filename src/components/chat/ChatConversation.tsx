@@ -535,6 +535,29 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                         </div>
                     );
                 })}
+                {status === "error" && (
+                    <Message from="assistant" className="items-start">
+                        <div className="flex w-full flex-col">
+                            <MessageContent
+                                variant="contained"
+                                role="alert"
+                                className="w-fit !border-destructive/30 !bg-destructive/5 !text-destructive !ring-destructive/10"
+                            >
+                                <div className="flex items-start gap-3">
+                                    <span aria-hidden="true" className="text-lg leading-7">
+                                        ⚠️
+                                    </span>
+                                    <div>
+                                        <p className="font-semibold">Une erreur est survenue.</p>
+                                        <p className="text-sm leading-6 text-destructive/80">
+                                            Impossible de générer la réponse pour le moment. Veuillez réessayer.
+                                        </p>
+                                    </div>
+                                </div>
+                            </MessageContent>
+                        </div>
+                    </Message>
+                )}
                 {((status === "submitted") || (status === "streaming" && messages.at(-1)?.role === "assistant" && messages.at(-1)?.parts.length === 0)) && <Loader className="mt-2" />}
             </ConversationContent>
             <ConversationScrollButton />

@@ -6,9 +6,12 @@ import SearchSessionsModal from "@/components/chat/SearchSessionsModal";
 import { getChatSession } from "@/services/chat-sessions";
 import { nanoid } from "nanoid";
 import { useMemo } from "react";
+import { useSession } from "@/lib/auth";
 
 const ChatPage = () => {
     const [searchParams] = useSearchParams();
+    const { data: session } = useSession();
+    const userKey = session?.user.id || session?.user.email;
     const existingSessionId = searchParams.get("sessionId");
 
     // Recompute sessionId when URL params change.
@@ -22,9 +25,9 @@ const ChatPage = () => {
     const isNewChat = !existingSessionId;
 
     const { data: existingChatSession = null } = useQuery({
-        queryKey: ["chatSession", existingSessionId],
+        queryKey: ["chatSession", userKey, existingSessionId],
         queryFn: () => getChatSession(existingSessionId!),
-        enabled: !!existingSessionId,
+        enabled: !!userKey && !!existingSessionId,
     });
 
     // No blocking loading check here — Chat always renders so the sidebar stays visible.
@@ -34,7 +37,7 @@ const ChatPage = () => {
         <>
             {/* key forces Chat to remount with fresh state when switching sessions */}
             <Chat
-                key={sessionId}
+                key={`${userKey ?? "anonymous"}:${sessionId}`}
                 isNewChat={isNewChat}
                 sessionId={sessionId}
                 existingChatSession={existingChatSession}

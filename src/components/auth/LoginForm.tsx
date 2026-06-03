@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { login, register as registerUser } from "@/services/auth";
 import logoUrl from "@/assets/CERIST.png";
+import { useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 
 const loginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address." }),
@@ -33,10 +35,23 @@ const registerSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+const getAuthErrorMessage = (error: unknown, fallback: string) => {
+  if (isAxiosError<{ detail?: string }>(error)) {
+    return error.response?.data?.detail || error.message || fallback;
+  }
+
+  if (error instanceof Error) {
+    return error.message || fallback;
+  }
+
+  return fallback;
+};
+
 const LoginForm = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -56,14 +71,11 @@ const LoginForm = () => {
   const handleLogin = async (values: LoginFormValues) => {
     try {
       setIsSubmitting(true);
+      queryClient.clear();
       await login(values.email, values.password);
       navigate("/", { replace: true });
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.detail ||
-          error?.message ||
-          "Invalid email or password",
-      );
+    } catch (error: unknown) {
+      toast.error(getAuthErrorMessage(error, "Invalid email or password"));
     } finally {
       setIsSubmitting(false);
     }
@@ -72,15 +84,12 @@ const LoginForm = () => {
   const handleRegister = async (values: RegisterFormValues) => {
     try {
       setIsSubmitting(true);
+      queryClient.clear();
       await registerUser(values);
       await login(values.email, values.password);
       navigate("/", { replace: true });
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.detail ||
-          error?.message ||
-          "Failed to create account",
-      );
+    } catch (error: unknown) {
+      toast.error(getAuthErrorMessage(error, "Failed to create account"));
     } finally {
       setIsSubmitting(false);
     }

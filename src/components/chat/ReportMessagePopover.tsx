@@ -12,12 +12,13 @@ import { cn } from "@/lib/utils";
 
 interface ReportMessagePopoverProps {
     messageId: string;
+    resolveMessageId?: () => Promise<string>;
     children: React.ReactNode;
     onReportSuccess: (messageId: string) => void;
     disabled?: boolean;
 }
 
-export const ReportMessagePopover = ({ messageId, children, onReportSuccess, disabled }: ReportMessagePopoverProps) => {
+export const ReportMessagePopover = ({ messageId, resolveMessageId, children, onReportSuccess, disabled }: ReportMessagePopoverProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [reason, setReason] = useState("");
     const [details, setDetails] = useState("");
@@ -99,7 +100,10 @@ export const ReportMessagePopover = ({ messageId, children, onReportSuccess, dis
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`${API_URL}/rag/message/${messageId}/report`, {
+            const savedMessageId = resolveMessageId
+                ? await resolveMessageId()
+                : messageId;
+            const response = await fetch(`${API_URL}/rag/message/${savedMessageId}/report`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -117,7 +121,7 @@ export const ReportMessagePopover = ({ messageId, children, onReportSuccess, dis
             setIsOpen(false);
             setReason("");
             setDetails("");
-            onReportSuccess(messageId);
+            onReportSuccess(savedMessageId);
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : "Erreur lors de l'envoi du signalement";
             toast.error(message);

@@ -10,21 +10,19 @@ import { cn } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import objectionImg from "@/assets/objection.jpg";
 import { toast } from "sonner";
 import ChatConversation from "./ChatConversation";
 import { DefaultChatTransport } from "ai";
 import { nanoid } from "nanoid";
-import Logo from "@/components/Logo";
 import ChatInput from "@/components/chat/ChatInput";
 import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { ChatMessage, ChatSession } from "@/types/globals";
 import { API_URL } from "@/lib/constants";
-import { getToken, useSession } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 import { getChatSession } from "@/services/chat-sessions";
-import { Button } from "@/components/ui/button";
 
 interface ChatProps {
   sessionId: string;
@@ -37,6 +35,17 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
 
   const [input, setInput] = useState("");
   const [showObjection, setShowObjection] = useState(false);
+  const welcomeQuestion = useMemo(() => {
+    const questions = [
+      "Quelle est votre question juridique ?",
+      "Que souhaitez-vous vérifier ?",
+      "Quel texte voulez-vous comprendre ?",
+      "Quelle situation voulez-vous analyser ?",
+      "Sur quel point souhaitez-vous être guidé ?",
+    ];
+
+    return questions[Math.floor(Math.random() * questions.length)];
+  }, []);
   const queryClient = useQueryClient();
 
   const { messages, setMessages, sendMessage, status } = useChat({
@@ -49,8 +58,8 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
       },
     }),
     messages: existingChatSession?.chatMessages ?? [],
-    onFinish: ({ messages }) => {
-      if (messages.length === 2) {
+    onFinish: ({ messages: finishedMessages }) => {
+      if (finishedMessages.length === 2) {
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions-history"],
           exact: false,
@@ -59,25 +68,66 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
 
       queryClient.invalidateQueries({ queryKey: ["user"] });
 
-      // Fetch the session after a small delay to ensure backend has saved the message
-      setTimeout(async () => {
-        try {
-          const session = await getChatSession(sessionId);
-          if (session && session.chatMessages) {
+      void (async () => {
+        const retryDelays = [300, 500, 800, 1200, 1800, 2500];
+
+        for (const delay of retryDelays) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+
+          try {
+            const session = await getChatSession(sessionId, { fresh: true });
+            const savedMessages = session?.chatMessages ?? [];
+            const finishedAssistantCount = finishedMessages.filter(
+              (message) => message.role === "assistant",
+            ).length;
+            const savedAssistantCount = savedMessages.filter(
+              (message) => message.role === "assistant",
+            ).length;
+
+            if (savedAssistantCount < finishedAssistantCount) {
+              continue;
+            }
+
             setMessages((currentMessages) => {
-              return currentMessages.map((msg, index) => {
-                const dbMsg = session.chatMessages[index];
-                if (dbMsg && dbMsg.role === msg.role) {
-                  return { ...msg, id: dbMsg.id, feedback: dbMsg.feedback };
+              const rolePositions: Partial<Record<ChatMessage["role"], number>> =
+                {};
+              const savedMessagesByRole = {
+                system: savedMessages.filter(
+                  (message) => message.role === "system",
+                ),
+                user: savedMessages.filter(
+                  (message) => message.role === "user",
+                ),
+                assistant: savedMessages.filter(
+                  (message) => message.role === "assistant",
+                ),
+              };
+
+              return currentMessages.map((message) => {
+                const rolePosition = rolePositions[message.role] ?? 0;
+                const savedMessage =
+                  savedMessagesByRole[message.role][rolePosition];
+                rolePositions[message.role] = rolePosition + 1;
+
+                if (savedMessage?.id) {
+                  return {
+                    ...message,
+                    id: savedMessage.id,
+                    feedback: savedMessage.feedback,
+                  };
                 }
-                return msg;
+
+                return message;
               });
             });
+            return;
+          } catch {
+            // Persistence can briefly lag behind stream completion.
           }
-        } catch (error) {
-          console.error("Failed to sync messages:", error);
         }
-      }, 1000);
+
+        console.error("Failed to sync saved chat messages after retrying.");
+      })();
     },
     onError: (error) => {
       toast.error(error.message || "Échec de l'envoi du message");
@@ -174,7 +224,12 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
               ) : (
                 <>
                   {hasMessages && (
-                    <ChatConversation messages={messages} status={status} onEditClick={handleEditClick} />
+                    <ChatConversation
+                      messages={messages}
+                      status={status}
+                      sessionId={sessionId}
+                      onEditClick={handleEditClick}
+                    />
                   )}
                   <div
                     className={cn(
@@ -183,8 +238,10 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
                     )}
                   >
                     {!hasMessages && (
-                      <div className="mx-auto">
-                        <Logo />
+                      <div className="mx-auto max-w-2xl px-4 text-center">
+                        <h1 className="text-xl font-medium leading-snug text-muted-foreground md:text-2xl">
+                          {welcomeQuestion}
+                        </h1>
                       </div>
                     )}
                     <ChatInput

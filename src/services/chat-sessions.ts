@@ -24,9 +24,18 @@ export async function deleteChatSession(sessionId: ChatSession["id"]) {
     return res.data;
 }
 
-export async function getChatSession(sessionId: ChatSession["id"]) {
+export async function getChatSession(
+    sessionId: ChatSession["id"],
+    options?: { fresh?: boolean },
+) {
     const res = await api.get<ChatSession & { chatMessages: ChatMessage[] }>(
         `/rag/session/${sessionId}`,
+        options?.fresh
+            ? {
+                  params: { _ts: Date.now() },
+                  headers: { "Cache-Control": "no-cache" },
+              }
+            : undefined,
     );
     return res.data;
 }

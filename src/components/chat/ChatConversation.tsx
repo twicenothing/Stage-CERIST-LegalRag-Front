@@ -29,6 +29,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { API_URL } from "@/lib/constants";
 import { getToken } from "@/lib/auth";
+import { getChatSession } from "@/services/chat-sessions";
 import { ReportMessagePopover } from "./ReportMessagePopover";
 
 const parseTextAndSources = (text: string) => {
@@ -193,23 +194,59 @@ const ProgressiveLoader = () => {
 interface ChatConversationProps {
     messages: ChatMessage[];
     status: ChatStatus;
+    sessionId: string;
     onEditClick?: (text: string) => void;
 }
 
-const ChatConversation = ({ messages, status, onEditClick }: ChatConversationProps) => {
+const ChatConversation = ({ messages, status, sessionId, onEditClick }: ChatConversationProps) => {
     const [feedbackState, setFeedbackState] = useState<Record<string, "like" | "dislike" | null>>({});
     const [reportedMessages, setReportedMessages] = useState<Set<string>>(new Set());
+    const isSavedMessage = (messageId: string) => Boolean(messageId && messageId.length >= 32);
 
-    const handleFeedback = async (messageId: string, feedback: "like" | "dislike" | null) => {
-        if (!messageId || messageId.length < 32) {
-            toast.error("Veuillez patienter, la réponse n'est pas encore enregistrée.");
-            return;
+    const resolveSavedMessageId = async (message: ChatMessage, messageIndex: number) => {
+        if (isSavedMessage(message.id)) {
+            return message.id;
         }
 
-        setFeedbackState(prev => ({ ...prev, [messageId]: feedback }));
+        const rolePosition = messages
+            .slice(0, messageIndex + 1)
+            .filter((item) => item.role === message.role).length - 1;
+        const retryDelays = [0, 300, 600, 1000, 1500, 2500];
+
+        for (const delay of retryDelays) {
+            if (delay > 0) {
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+
+            try {
+                const session = await getChatSession(sessionId, { fresh: true });
+                const savedMessage = session.chatMessages
+                    .filter((item) => item.role === message.role)
+                    .at(rolePosition);
+
+                if (savedMessage && isSavedMessage(savedMessage.id)) {
+                    return savedMessage.id;
+                }
+            } catch {
+                // The saved response can briefly lag behind stream completion.
+            }
+        }
+
+        throw new Error("Saved message ID is not available yet.");
+    };
+
+    const handleFeedback = async (
+        message: ChatMessage,
+        messageIndex: number,
+        feedback: "like" | "dislike" | null,
+    ) => {
+        const displayedMessageId = message.id;
+        let savedMessageId = displayedMessageId;
+        setFeedbackState(prev => ({ ...prev, [displayedMessageId]: feedback }));
         
         try {
-            const response = await fetch(`${API_URL}/rag/message/${messageId}/feedback`, {
+            savedMessageId = await resolveSavedMessageId(message, messageIndex);
+            const response = await fetch(`${API_URL}/rag/message/${savedMessageId}/feedback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,10 +258,17 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
             if (!response.ok) {
                 throw new Error("Erreur de feedback");
             }
+
+            setFeedbackState(prev => ({
+                ...prev,
+                [displayedMessageId]: feedback,
+                [savedMessageId]: feedback,
+            }));
         } catch {
             setFeedbackState(prev => {
                 const newState = { ...prev };
-                delete newState[messageId];
+                delete newState[displayedMessageId];
+                delete newState[savedMessageId];
                 return newState;
             });
             toast.error("Erreur lors de l'envoi du feedback");
@@ -234,7 +278,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
     return (
         <Conversation className="h-full">
             <ConversationContent className="max-md:p-2">
-                {messages.map((message) => {
+                {messages.map((message, messageIndex) => {
                     // const toolCalls = getToolCalls(message);
                     return (
                         <div key={message.id}>
@@ -378,25 +422,32 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                                                         className="flex flex-row gap-1"
                                                                                     >
                                                                                         <Action
-                                                                                            onClick={() => handleFeedback(message.id, "like")}
+                                                                                            onClick={() => handleFeedback(message, messageIndex, "like")}
                                                                                             label="J'aime"
                                                                                         >
                                                                                             <ThumbsUpIcon className="size-3" />
                                                                                         </Action>
                                                                                         <Action
-                                                                                            onClick={() => handleFeedback(message.id, "dislike")}
+                                                                                            onClick={() => handleFeedback(message, messageIndex, "dislike")}
                                                                                             label="Je n'aime pas"
                                                                                         >
                                                                                             <ThumbsDownIcon className="size-3" />
                                                                                         </Action>
                                                                                         <ReportMessagePopover
                                                                                             messageId={message.id}
-                                                                                            onReportSuccess={(id) => setReportedMessages(prev => new Set(prev).add(id))}
+                                                                                            resolveMessageId={() => resolveSavedMessageId(message, messageIndex)}
+                                                                                            onReportSuccess={(id) => setReportedMessages(prev => {
+                                                                                                const next = new Set(prev);
+                                                                                                next.add(message.id);
+                                                                                                next.add(id);
+                                                                                                return next;
+                                                                                            })}
                                                                                             disabled={reportedMessages.has(message.id)}
                                                                                         >
                                                                                             <Action
                                                                                                 onClick={() => {}}
                                                                                                 label={reportedMessages.has(message.id) ? "Déjà signalé" : "Signaler un problème"}
+                                                                                                disabled={reportedMessages.has(message.id)}
                                                                                             >
                                                                                                 <FlagIcon className="size-3" />
                                                                                             </Action>
@@ -411,7 +462,7 @@ const ChatConversation = ({ messages, status, onEditClick }: ChatConversationPro
                                                                                         transition={{ duration: 0.15 }}
                                                                                     >
                                                                                         <Action
-                                                                                            onClick={() => handleFeedback(message.id, null)}
+                                                                                            onClick={() => handleFeedback(message, messageIndex, null)}
                                                                                             label="Retirer l'avis"
                                                                                             className="text-emerald-500 opacity-100 dark:text-emerald-400"
                                                                                         >

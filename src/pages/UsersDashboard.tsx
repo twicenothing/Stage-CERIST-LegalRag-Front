@@ -1,17 +1,35 @@
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "@/services/users";
 import { ShieldAlertIcon, ShieldCheckIcon } from "lucide-react";
 
 import { Spinner } from "@/components/ui/spinner";
+import { SearchInput } from "@/components/ui/search-input";
 import CreateUserModal from "@/components/dashboard/CreateUserModal";
 import UpdateUserModal from "@/components/dashboard/UpdateUserModal";
 import DeleteUserDialog from "@/components/dashboard/DeleteUserDialog";
 
 const UsersDashboard = () => {
+    const [searchQuery, setSearchQuery] = useState("");
     const { data: users, isLoading, isError } = useQuery({
         queryKey: ["users"],
         queryFn: getUsers,
     });
+
+    const filteredUsers = useMemo(() => {
+        const normalizedQuery = searchQuery.trim().toLocaleLowerCase("fr");
+
+        if (!normalizedQuery) {
+            return users ?? [];
+        }
+
+        return (users ?? []).filter((user) => {
+            const fullName = `${user.first_name} ${user.last_name}`.toLocaleLowerCase("fr");
+            const email = user.email.toLocaleLowerCase("fr");
+
+            return fullName.includes(normalizedQuery) || email.includes(normalizedQuery);
+        });
+    }, [searchQuery, users]);
 
     return (
         <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
@@ -23,6 +41,16 @@ const UsersDashboard = () => {
                     </p>
                 </div>
                 <CreateUserModal />
+            </div>
+
+            <div className="px-6 py-4 border-b">
+                <SearchInput
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Rechercher par nom complet ou email"
+                    aria-label="Rechercher un utilisateur par nom complet ou email"
+                    wrapperClassName="w-full sm:max-w-md"
+                />
             </div>
 
             <div className="p-0 overflow-x-auto">
@@ -38,6 +66,10 @@ const UsersDashboard = () => {
                     <div className="text-center py-12 text-muted-foreground">
                         Aucun autre utilisateur trouvé.
                     </div>
+                ) : filteredUsers.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                        Aucun utilisateur ne correspond à votre recherche.
+                    </div>
                 ) : (
                     <table className="w-full text-sm text-left whitespace-nowrap">
                         <thead className="bg-muted/50 text-muted-foreground">
@@ -50,7 +82,7 @@ const UsersDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y">
-                            {users.map((user) => (
+                            {filteredUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                                     <td className="px-6 py-4 font-medium text-foreground">
                                         {user.first_name} {user.last_name}

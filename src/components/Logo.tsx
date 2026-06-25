@@ -5,7 +5,7 @@ const Logo = () => {
     <div className="flex items-center gap-2 text-foreground">
       <Scale className="h-8 w-8" />
       <div className="font-extrabold text-2xl">
-        Légal DjazairIA
+        JurIA
       </div>
     </div>
   );

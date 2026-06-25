@@ -15,6 +15,7 @@ import {
   getUserChatSessions,
   archiveChatSession,
   unarchiveChatSession,
+  getChatSession,
 } from "@/services/chat-sessions";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,12 +30,17 @@ import {
   TrashIcon,
   ArchiveRestoreIcon,
   ChevronRightIcon,
+  FileDownIcon,
 } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useState } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ChatSessionPdfExport from "./ChatSessionPdfExport";
+import { printChatSessionPdf } from "@/lib/chat-session-pdf";
 
 const SessionList = ({ archived }: { archived: boolean }) => {
   const [searchParams] = useSearchParams();
@@ -43,6 +49,7 @@ const SessionList = ({ archived }: { archived: boolean }) => {
   const userKey = session?.user.id || session?.user.email;
   const { toggle } = useModal();
   const queryClient = useQueryClient();
+  const [exportingSessionId, setExportingSessionId] = useState<string | null>(null);
 
   const { data: allSessions, isLoading } = useQuery({
     queryKey: ["chat-sessions-history", userKey],
@@ -61,6 +68,44 @@ const SessionList = ({ archived }: { archived: boolean }) => {
     },
     onError: () => toast.error("Une erreur s'est produite"),
   });
+
+  const handleExportPdf = async (chatSession: { id: string; title: string }) => {
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+
+    if (!printWindow) {
+      toast.error("Autorisez les fenêtres pop-up pour exporter le PDF.");
+      return;
+    }
+
+    setExportingSessionId(chatSession.id);
+
+    try {
+      const session = await getChatSession(chatSession.id, { fresh: true });
+      const messages = session.chatMessages ?? [];
+
+      if (messages.length === 0) {
+        printWindow.close();
+        toast.error("Aucune conversation à exporter.");
+        return;
+      }
+
+      const title = session.title || chatSession.title || "Conversation JurIA";
+      const contentHtml = renderToStaticMarkup(
+        <ChatSessionPdfExport messages={messages} title={title} />,
+      );
+
+      printChatSessionPdf({
+        contentHtml,
+        printWindow,
+        title,
+      });
+    } catch {
+      printWindow.close();
+      toast.error("Impossible d'exporter cette conversation.");
+    } finally {
+      setExportingSessionId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -132,6 +177,18 @@ const SessionList = ({ archived }: { archived: boolean }) => {
                             Archiver
                           </>
                         )}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={exportingSessionId === chatSession.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void handleExportPdf(chatSession);
+                        }}
+                      >
+                        <FileDownIcon className="mr-2 size-4" />
+                        {exportingSessionId === chatSession.id
+                          ? "Préparation..."
+                          : "Exporter PDF"}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"

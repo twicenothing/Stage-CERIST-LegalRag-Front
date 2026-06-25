@@ -38,12 +38,6 @@ export const ReportMessagePopover = ({ messageId, resolveMessageId, children, on
     });
 
     useEffect(() => {
-        if (!isOpen) {
-            setPosition({ x: 0, y: 0 });
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
         if (!isDragging) return;
 
         const handlePointerMove = (event: PointerEvent) => {
@@ -92,6 +86,18 @@ export const ReportMessagePopover = ({ messageId, resolveMessageId, children, on
         event.preventDefault();
     };
 
+    const handleOpenChange = (open: boolean) => {
+        if (disabled) return;
+
+        if (open) {
+            setPosition({ x: 0, y: 0 });
+        } else {
+            setIsDragging(false);
+        }
+
+        setIsOpen(open);
+    };
+
     const handleSubmit = async () => {
         if (!reason) {
             toast.error("Veuillez sélectionner une raison");
@@ -131,10 +137,7 @@ export const ReportMessagePopover = ({ messageId, resolveMessageId, children, on
     };
 
     return (
-        <Popover.Root open={isOpen} onOpenChange={(open) => {
-            if (disabled) return;
-            setIsOpen(open);
-        }}>
+        <Popover.Root open={isOpen} onOpenChange={handleOpenChange}>
             <Popover.Trigger asChild>
                 <div className={cn(disabled && "opacity-50 cursor-not-allowed")}>
                     {children}

@@ -233,3 +233,54 @@ h6 {
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
 }
+
+.markdown-message {
+    line-height: 1.6;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: normal;
+}
+
+.markdown-message table {
+    border-collapse: collapse;
+    min-width: 100%;
+    margin: 12px 0;
+    font-size: 0.95rem;
+    overflow: hidden;
+}
+
+.markdown-message th,
+.markdown-message td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.markdown-message th {
+    font-weight: 600;
+    background: var(--muted);
+}
+
+.markdown-message p {
+    margin: 8px 0;
+}
+
+.markdown-message > *:first-child {
+    margin-top: 0;
+}
+
+.markdown-message > *:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-message ul,
+.markdown-message ol {
+    padding-left: 24px;
+}
+
+.markdown-message code {
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: var(--muted);
+}

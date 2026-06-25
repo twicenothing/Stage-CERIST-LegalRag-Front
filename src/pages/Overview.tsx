@@ -88,7 +88,7 @@ export default function Overview() {
     return (
         <div className="min-h-screen bg-background pb-24">
             <PageHeader
-                title="Légale DjazairIA"
+                title="JurIA"
                 subtitle="Guide pratique"
                 showBackButton
             />
@@ -110,7 +110,7 @@ export default function Overview() {
                                     Un assistant juridique pour explorer les textes algériens plus vite.
                                 </h2>
                                 <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-                                    Légale DjazairIA analyse votre question, recherche les passages pertinents
+                                    JurIA analyse votre question, recherche les passages pertinents
                                     dans les documents disponibles, puis prépare une synthèse claire avec des
                                     sources vérifiables.
                                 </p>

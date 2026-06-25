@@ -29,7 +29,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
                             type="button"
                             onClick={onRandomize}
                             className="text-muted-foreground hover:text-foreground focus-visible:outline-none"
-                            aria-label="Randomize"
+                            aria-label="Générer un mot de passe"
                         >
                             <HugeiconsIcon
                                 strokeWidth={2}
@@ -44,7 +44,9 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
                         onClick={() => setIsVisible((v) => !v)}
                         className="text-muted-foreground hover:text-foreground focus-visible:outline-none"
                         aria-label={
-                            isVisible ? "Hide password" : "Show password"
+                            isVisible
+                                ? "Masquer le mot de passe"
+                                : "Afficher le mot de passe"
                         }
                     >
                         {isVisible ? (

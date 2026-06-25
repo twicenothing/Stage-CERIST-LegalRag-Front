@@ -31,6 +31,7 @@ import { API_URL } from "@/lib/constants";
 import { getToken } from "@/lib/auth";
 import { getChatSession } from "@/services/chat-sessions";
 import { ReportMessagePopover } from "./ReportMessagePopover";
+import MarkdownMessage from "./MarkdownMessage";
 
 const parseTextAndSources = (text: string) => {
     const match = text.match(/^(.*?)(?:\n\n)?\*\*Documents pertinents\s*:\*\*(.*)$/is);
@@ -122,22 +123,26 @@ const SourcesViewer = ({ sources }: { sources: { title: string; percentage: stri
             </button>
             
             <div className={cn("flex flex-wrap gap-2")}>
-                {(isOpen ? sources : sources.slice(0, 1)).map((s, idx) => (
-                    <button 
-                        key={idx} 
-                        onClick={() => handleOpenPdf(s.title, s.page)}
-                        className={cn("flex items-center gap-2 p-1.5 px-2.5 rounded-md border bg-background text-xs shadow-sm w-fit max-w-[280px] cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring", getColorClass(s.percentage))}
-                        title={`Ouvrir ${s.title}`}
-                    >
-                        <FileIcon className="size-3.5 shrink-0 opacity-70" />
-                        <span className="font-medium truncate text-left">{s.title}</span>
-                        {s.percentage && (
-                            <span className="font-bold ml-1">
-                                {s.percentage}
-                            </span>
-                        )}
-                    </button>
-                ))}
+                {(isOpen ? sources : sources.slice(0, 1)).map((s, idx) => {
+                    const displayTitle = `Document légal ${idx + 1}`;
+
+                    return (
+                        <button
+                            key={idx}
+                            onClick={() => handleOpenPdf(s.title, s.page)}
+                            className={cn("flex items-center gap-2 p-1.5 px-2.5 rounded-md border bg-background text-xs shadow-sm w-fit max-w-[280px] cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring", getColorClass(s.percentage))}
+                            title={`Ouvrir ${displayTitle}`}
+                        >
+                            <FileIcon className="size-3.5 shrink-0 opacity-70" />
+                            <span className="font-medium truncate text-left">{displayTitle}</span>
+                            {s.percentage && (
+                                <span className="font-bold ml-1">
+                                    {s.percentage}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             <Dialog open={!!selectedPdf} onOpenChange={(open) => !open && setSelectedPdf(null)}>
@@ -388,9 +393,7 @@ const ChatConversation = ({ messages, status, sessionId, onEditClick }: ChatConv
                                                     >
                                                         <div className="flex flex-col w-full">
                                                             <MessageContent variant="contained" className={cn("w-fit", reportedMessages.has(message.id) && "opacity-50 grayscale transition-all duration-300")}>
-                                                                <Response>
-                                                                    {mainText}
-                                                                </Response>
+                                                                <MarkdownMessage content={mainText} />
                                                             </MessageContent>
                                                             <SourcesViewer sources={sources} />
                                                             <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 flex flex-row items-center gap-1">

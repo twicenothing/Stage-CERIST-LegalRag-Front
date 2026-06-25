@@ -9,6 +9,7 @@ import DashboardLayout from "@/pages/DashboardLayout";
 import UsersDashboard from "@/pages/UsersDashboard";
 import StatisticsDashboard from "@/pages/StatisticsDashboard";
 import ReportsDashboard from "@/pages/ReportsDashboard";
+import ConfigurationsDashboard from "@/pages/ConfigurationsDashboard";
 import { Navigate } from "react-router-dom";
 
 const Router = () => {
@@ -23,6 +24,7 @@ const Router = () => {
           <Route path="users" element={<UsersDashboard />} />
           <Route path="statistics" element={<StatisticsDashboard />} />
           <Route path="reports" element={<ReportsDashboard />} />
+          <Route path="configurations" element={<ConfigurationsDashboard />} />
         </Route>
       </Route>
       <Route element={<AuthRoute />}>

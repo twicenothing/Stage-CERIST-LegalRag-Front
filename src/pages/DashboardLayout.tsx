@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/auth";
 import { Navigate, useNavigate, Outlet, useLocation, Link } from "react-router-dom";
-import { ArrowLeftIcon, UsersIcon, BarChart3Icon, FlagIcon } from "lucide-react";
+import { ArrowLeftIcon, UsersIcon, BarChart3Icon, FlagIcon, Settings2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,11 @@ const DashboardLayout = () => {
             name: "Signalements",
             href: "/dashboard/reports",
             icon: FlagIcon,
+        },
+        {
+            name: "Configurations",
+            href: "/dashboard/configurations",
+            icon: Settings2Icon,
         },
     ];
 

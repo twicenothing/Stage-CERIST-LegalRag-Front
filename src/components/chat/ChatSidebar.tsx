@@ -78,7 +78,7 @@ const ChatSidebar = ({ sessionId, ...props }: ChatSidebarProps) => {
                                 <SidebarMenuButton asChild className="text-foreground font-medium">
                                     <Link className="group" to="/dashboard">
                                         <LayoutDashboardIcon className="size-5 mr-2" />
-                                        <span>Tableau de bord</span>
+                                        <span>Espace admin</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

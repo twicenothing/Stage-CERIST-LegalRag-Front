@@ -372,7 +372,11 @@ const ChatConversation = ({ messages, status, sessionId, onEditClick }: ChatConv
                                                         <Fragment key={`${message.id}-${i}`}>
                                                             <Message from={message.role} className="group items-start">
                                                                 <div className="flex flex-col w-full">
-                                                                    <MessageContent variant="contained" className="w-fit px-5 py-4">
+                                                                    <MessageContent
+                                                                        key="assistant-thinking"
+                                                                        variant="contained"
+                                                                        className="w-fit px-5 py-4"
+                                                                    >
                                                                         <ProgressiveLoader />
                                                                     </MessageContent>
                                                                 </div>
@@ -392,7 +396,11 @@ const ChatConversation = ({ messages, status, sessionId, onEditClick }: ChatConv
                                                         className="group items-start"
                                                     >
                                                         <div className="flex flex-col w-full">
-                                                            <MessageContent variant="contained" className={cn("w-fit", reportedMessages.has(message.id) && "opacity-50 grayscale transition-all duration-300")}>
+                                                            <MessageContent
+                                                                key="assistant-answer"
+                                                                variant="flat"
+                                                                className={cn("w-full max-w-none animate-in fade-in duration-150", reportedMessages.has(message.id) && "opacity-50 grayscale transition-all duration-300")}
+                                                            >
                                                                 <MarkdownMessage content={mainText} />
                                                             </MessageContent>
                                                             <SourcesViewer sources={sources} />

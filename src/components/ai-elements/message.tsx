@@ -25,16 +25,16 @@ const messageContentVariants = cva(
 		variants: {
 			variant: {
 				contained: [
-					"group-[.is-user]:max-w-[82%] group-[.is-user]:rounded-br-md group-[.is-user]:border group-[.is-user]:border-primary/20 group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground group-[.is-user]:shadow-[0_16px_35px_-24px_rgba(16,185,129,0.85)]",
+					"group-[.is-user]:max-w-[82%] group-[.is-user]:rounded-br-md group-[.is-user]:border group-[.is-user]:border-border/70 group-[.is-user]:bg-white group-[.is-user]:text-foreground group-[.is-user]:ring-1 group-[.is-user]:ring-foreground/5 group-[.is-user]:shadow-[0_18px_45px_-34px_rgba(15,23,42,0.55)] dark:group-[.is-user]:bg-card/95",
 					"sm:group-[.is-user]:max-w-[72%]",
 					"group-[.is-assistant]:max-w-[92%] group-[.is-assistant]:rounded-bl-md group-[.is-assistant]:border group-[.is-assistant]:border-border/70 group-[.is-assistant]:bg-card/95 group-[.is-assistant]:text-foreground group-[.is-assistant]:ring-1 group-[.is-assistant]:ring-foreground/5 group-[.is-assistant]:shadow-[0_18px_45px_-34px_rgba(15,23,42,0.7)]",
 					"sm:group-[.is-assistant]:max-w-[86%]",
-					"group-[.is-user]:[&_a]:text-primary-foreground group-[.is-user]:[&_a]:decoration-primary-foreground/60 group-[.is-user]:[&_code]:bg-primary-foreground/15 group-[.is-user]:[&_code]:text-primary-foreground",
+					"group-[.is-user]:[&_code]:bg-muted group-[.is-user]:[&_code]:text-foreground",
 				],
 				flat: [
-					"group-[.is-user]:max-w-[82%] group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:bg-primary/10 group-[.is-user]:text-foreground",
+					"group-[.is-user]:max-w-[82%] group-[.is-user]:rounded-2xl group-[.is-user]:rounded-br-md group-[.is-user]:border group-[.is-user]:border-border/70 group-[.is-user]:bg-white group-[.is-user]:text-foreground dark:group-[.is-user]:bg-card/95",
 					"sm:group-[.is-user]:max-w-[72%]",
-					"group-[.is-assistant]:max-w-[92%] group-[.is-assistant]:text-foreground sm:group-[.is-assistant]:max-w-[86%]",
+					"group-[.is-assistant]:max-w-[92%] group-[.is-assistant]:overflow-visible group-[.is-assistant]:rounded-none group-[.is-assistant]:px-0 group-[.is-assistant]:py-1 group-[.is-assistant]:text-foreground group-[.is-assistant]:shadow-none sm:group-[.is-assistant]:max-w-[86%]",
 				],
 			},
 		},

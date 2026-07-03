@@ -88,6 +88,21 @@ const Chat = ({ sessionId, existingChatSession, isNewChat }: ChatProps) => {
               continue;
             }
 
+            queryClient.setQueriesData<ChatSession & { chatMessages: ChatMessage[] }>(
+              { queryKey: ["chatSession"], exact: false },
+              (cachedSession) => {
+                if (cachedSession?.id === sessionId) {
+                  return session;
+                }
+
+                return cachedSession;
+              },
+            );
+            queryClient.invalidateQueries({
+              queryKey: ["chatSession"],
+              exact: false,
+            });
+
             setMessages((currentMessages) => {
               const rolePositions: Partial<Record<ChatMessage["role"], number>> =
                 {};

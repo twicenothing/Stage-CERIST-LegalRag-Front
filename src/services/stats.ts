@@ -48,6 +48,32 @@ export interface MonthlyTraffic {
     count: number;
 }
 
+export interface DailyLatency {
+    date: string;
+    avg_total_duration_seconds: number;
+}
+
+export interface SlowQuery {
+    created_at: string | null;
+    total_duration_seconds: number | null;
+    time_to_first_token_seconds: number | null;
+    source_count: number | null;
+    answer_chars: number | null;
+    refused: boolean | null;
+    model_id: string | null;
+}
+
+export interface StatsHealth {
+    avg_total_duration_seconds: number;
+    p95_total_duration_seconds: number;
+    avg_time_to_first_token_seconds: number;
+    slow_queries_count: number;
+    slow_queries_rate: number;
+    avg_source_count: number;
+    daily_latency: DailyLatency[];
+    recent_slow_queries: SlowQuery[];
+}
+
 export interface StatsResponse {
     period: StatsPeriod;
     overview: StatsOverview;
@@ -60,10 +86,11 @@ export interface StatsResponse {
         no_answer_count: number;
         no_answer_rate: number;
     };
+    health: StatsHealth;
 }
 
 export async function getStats(days: StatsPeriodDays): Promise<StatsResponse> {
-    const url = new URL(`${API_URL.replace(/\/$/, "")}/stats/`);
+    const url = new URL(`${API_URL.replace(/\/$/, "")}/stats`);
     url.searchParams.set("days", String(days));
 
     const response = await fetch(url, {
